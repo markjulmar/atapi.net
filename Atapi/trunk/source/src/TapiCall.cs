@@ -21,6 +21,7 @@ using System.Collections.Generic;
 using System.Reflection;
 using JulMar.Atapi.Interop;
 using System.Globalization;
+using System.Threading;
 
 namespace JulMar.Atapi
 {
@@ -317,8 +318,36 @@ namespace JulMar.Atapi
     {
         #region Class Data
         private readonly HTCALL _hCall;
-        private readonly LINECALLINFO _lci = new LINECALLINFO();
-        private byte[] _lciData;
+
+        #region Last LINECALLINFO
+
+        /// <summary>
+        /// used to synchronize mutex access to last LINECALLINFO data 
+        /// </summary>
+        private readonly object m_syncLci = new object();
+
+        /// <summary>
+        /// Store last LINECALLINFO instance retrieved in <see cref="GatherCallInfo()"/>.
+        /// </summary>
+        /// <remarks>Access to this ref is allowed only to read a single members at once.
+        /// If more than one members has to read ad once, use <see cref="GetLastLineCallInfo()"/></remarks>
+        private LINECALLINFO _lci = new LINECALLINFO();
+        private byte[] m_lciData;
+
+        /// <summary>
+        /// Safely returns a copy to last LINECALLINFO and its byte[] data
+        /// </summary>
+        private void GetLastLineCallInfo(out LINECALLINFO lci, out byte[] lci_data)
+        {
+            lock (m_syncLci)
+            {
+                lci = _lci;
+                lci_data = m_lciData;
+            }
+        }
+
+        #endregion
+
         private readonly TapiAddress _addrOwner;
         private CallState _callState = CallState.Unknown;
         private DateTime _csTime;
@@ -454,10 +483,14 @@ namespace JulMar.Atapi
         {
             get
             {
-                if (_lci.dwCallDataSize == 0 || _lci.dwCallDataOffset == 0)
+                LINECALLINFO lci;
+                byte[] lciData;
+                GetLastLineCallInfo(out lci, out lciData);
+
+                if (lci.dwCallDataSize == 0 || lci.dwCallDataOffset == 0)
                     return null;
-                var data = new byte[_lci.dwCallDataSize];
-                Array.Copy(_lciData, _lci.dwCallDataOffset, data, 0, _lci.dwCallDataSize);
+                var data = new byte[lci.dwCallDataSize];
+                Array.Copy(lciData, lci.dwCallDataOffset, data, 0, lci.dwCallDataSize);
                 return data;
             }
 
@@ -540,9 +573,13 @@ namespace JulMar.Atapi
         {
             get
             {
-                if (_lci.dwUserUserInfoOffset == 0 || _lci.dwUserUserInfoSize == 0)
+                LINECALLINFO lci;
+                byte[] lciData;
+                GetLastLineCallInfo(out lci, out lciData);
+
+                if (lci.dwUserUserInfoOffset == 0 || lci.dwUserUserInfoSize == 0)
                     return string.Empty;
-                return NativeMethods.GetString(_lciData, _lci.dwUserUserInfoOffset, _lci.dwUserUserInfoSize, NativeMethods.STRINGFORMAT_ASCII);
+                return NativeMethods.GetString(lciData, lci.dwUserUserInfoOffset, lci.dwUserUserInfoSize, NativeMethods.STRINGFORMAT_ASCII);
             }
         }
 
@@ -575,8 +612,12 @@ namespace JulMar.Atapi
         {
             get 
             {
-                return ((_lci.dwCallerIDFlags & NativeMethods.LINECALLPARTYID_ADDRESS) > 0) ?
-                    NativeMethods.GetString(_lciData, _lci.dwCallerIDOffset, _lci.dwCallerIDSize, Line.StringFormat) : string.Empty;
+                LINECALLINFO lci;
+                byte[] lciData;
+                GetLastLineCallInfo(out lci, out lciData);
+
+                return ((lci.dwCallerIDFlags & NativeMethods.LINECALLPARTYID_ADDRESS) > 0) ?
+                    NativeMethods.GetString(lciData, lci.dwCallerIDOffset, lci.dwCallerIDSize, Line.StringFormat) : string.Empty;
             }
         }
 
@@ -587,8 +628,12 @@ namespace JulMar.Atapi
         {
             get
             {
-                return ((_lci.dwCallerIDFlags & NativeMethods.LINECALLPARTYID_NAME) > 0) ?
-                    NativeMethods.GetString(_lciData, _lci.dwCallerIDNameOffset, _lci.dwCallerIDNameSize, Line.StringFormat) : string.Empty;
+                LINECALLINFO lci;
+                byte[] lciData;
+                GetLastLineCallInfo(out lci, out lciData);
+
+                return ((lci.dwCallerIDFlags & NativeMethods.LINECALLPARTYID_NAME) > 0) ?
+                    NativeMethods.GetString(lciData, lci.dwCallerIDNameOffset, lci.dwCallerIDNameSize, Line.StringFormat) : string.Empty;
             }
         }
 
@@ -599,8 +644,12 @@ namespace JulMar.Atapi
         {
             get
             {
-                return ((_lci.dwCalledIDFlags & NativeMethods.LINECALLPARTYID_ADDRESS) > 0) ?
-                    NativeMethods.GetString(_lciData, _lci.dwCalledIDOffset, _lci.dwCalledIDSize, Line.StringFormat) : string.Empty;
+                LINECALLINFO lci;
+                byte[] lciData;
+                GetLastLineCallInfo(out lci, out lciData);
+
+                return ((lci.dwCalledIDFlags & NativeMethods.LINECALLPARTYID_ADDRESS) > 0) ?
+                    NativeMethods.GetString(lciData, lci.dwCalledIDOffset, lci.dwCalledIDSize, Line.StringFormat) : string.Empty;
             }
         }
 
@@ -611,8 +660,12 @@ namespace JulMar.Atapi
         {
             get
             {
-                return ((_lci.dwCalledIDFlags & NativeMethods.LINECALLPARTYID_NAME) > 0) ?
-                    NativeMethods.GetString(_lciData, _lci.dwCalledIDNameOffset, _lci.dwCalledIDNameSize, Line.StringFormat) : string.Empty;
+                LINECALLINFO lci;
+                byte[] lciData;
+                GetLastLineCallInfo(out lci, out lciData);
+
+                return ((lci.dwCalledIDFlags & NativeMethods.LINECALLPARTYID_NAME) > 0) ?
+                    NativeMethods.GetString(lciData, lci.dwCalledIDNameOffset, lci.dwCalledIDNameSize, Line.StringFormat) : string.Empty;
             }
         }
 
@@ -623,8 +676,12 @@ namespace JulMar.Atapi
         {
             get
             {
-                return ((_lci.dwConnectedIDFlags & NativeMethods.LINECALLPARTYID_ADDRESS) > 0) ?
-                    NativeMethods.GetString(_lciData, _lci.dwConnectedIDOffset, _lci.dwConnectedIDSize, Line.StringFormat) : string.Empty;
+                LINECALLINFO lci;
+                byte[] lciData;
+                GetLastLineCallInfo(out lci, out lciData);
+
+                return ((lci.dwConnectedIDFlags & NativeMethods.LINECALLPARTYID_ADDRESS) > 0) ?
+                    NativeMethods.GetString(lciData, lci.dwConnectedIDOffset, lci.dwConnectedIDSize, Line.StringFormat) : string.Empty;
             }
         }
 
@@ -635,8 +692,12 @@ namespace JulMar.Atapi
         {
             get
             {
-                return ((_lci.dwConnectedIDFlags & NativeMethods.LINECALLPARTYID_NAME) > 0) ?
-                    NativeMethods.GetString(_lciData, _lci.dwConnectedIDNameOffset, _lci.dwConnectedIDNameSize, Line.StringFormat) : string.Empty;
+                LINECALLINFO lci;
+                byte[] lciData;
+                GetLastLineCallInfo(out lci, out lciData);
+
+                return ((lci.dwConnectedIDFlags & NativeMethods.LINECALLPARTYID_NAME) > 0) ?
+                    NativeMethods.GetString(lciData, lci.dwConnectedIDNameOffset, lci.dwConnectedIDNameSize, Line.StringFormat) : string.Empty;
             }
         }
 
@@ -647,8 +708,12 @@ namespace JulMar.Atapi
         {
             get
             {
-                return ((_lci.dwRedirectingIDFlags & NativeMethods.LINECALLPARTYID_ADDRESS) > 0) ?
-                    NativeMethods.GetString(_lciData, _lci.dwRedirectingIDOffset, _lci.dwRedirectingIDSize, Line.StringFormat) : string.Empty;
+                LINECALLINFO lci;
+                byte[] lciData;
+                GetLastLineCallInfo(out lci, out lciData);
+
+                return ((lci.dwRedirectingIDFlags & NativeMethods.LINECALLPARTYID_ADDRESS) > 0) ?
+                    NativeMethods.GetString(lciData, lci.dwRedirectingIDOffset, lci.dwRedirectingIDSize, Line.StringFormat) : string.Empty;
             }
         }
 
@@ -659,8 +724,12 @@ namespace JulMar.Atapi
         {
             get
             {
-                return ((_lci.dwRedirectingIDFlags & NativeMethods.LINECALLPARTYID_NAME) > 0) ?
-                    NativeMethods.GetString(_lciData, _lci.dwRedirectingIDNameOffset, _lci.dwRedirectingIDNameSize, Line.StringFormat) : string.Empty;
+                LINECALLINFO lci;
+                byte[] lciData;
+                GetLastLineCallInfo(out lci, out lciData);
+
+                return ((lci.dwRedirectingIDFlags & NativeMethods.LINECALLPARTYID_NAME) > 0) ?
+                    NativeMethods.GetString(lciData, lci.dwRedirectingIDNameOffset, lci.dwRedirectingIDNameSize, Line.StringFormat) : string.Empty;
             }
         }
 
@@ -671,8 +740,12 @@ namespace JulMar.Atapi
         {
             get
             {
-                return ((_lci.dwRedirectionIDFlags & NativeMethods.LINECALLPARTYID_ADDRESS) > 0) ?
-                    NativeMethods.GetString(_lciData, _lci.dwRedirectionIDOffset, _lci.dwRedirectionIDSize, Line.StringFormat) : string.Empty;
+                LINECALLINFO lci;
+                byte[] lciData;
+                GetLastLineCallInfo(out lci, out lciData);
+
+                return ((lci.dwRedirectionIDFlags & NativeMethods.LINECALLPARTYID_ADDRESS) > 0) ?
+                    NativeMethods.GetString(lciData, lci.dwRedirectionIDOffset, lci.dwRedirectionIDSize, Line.StringFormat) : string.Empty;
             }
         }
 
@@ -683,8 +756,12 @@ namespace JulMar.Atapi
         {
             get
             {
-                return ((_lci.dwRedirectionIDFlags & NativeMethods.LINECALLPARTYID_NAME) > 0) ?
-                    NativeMethods.GetString(_lciData, _lci.dwRedirectionIDNameOffset, _lci.dwRedirectionIDNameSize, Line.StringFormat) : string.Empty;
+                LINECALLINFO lci;
+                byte[] lciData;
+                GetLastLineCallInfo(out lci, out lciData);
+
+                return ((lci.dwRedirectionIDFlags & NativeMethods.LINECALLPARTYID_NAME) > 0) ?
+                    NativeMethods.GetString(lciData, lci.dwRedirectionIDNameOffset, lci.dwRedirectionIDNameSize, Line.StringFormat) : string.Empty;
             }
         }
 
@@ -818,8 +895,12 @@ namespace JulMar.Atapi
         {
             get
             {
-                var data = new byte[_lci.dwDevSpecificSize];
-                Array.Copy(_lciData, _lci.dwDevSpecificOffset, data, 0, _lci.dwDevSpecificSize);
+                LINECALLINFO lci;
+                byte[] lciData;
+                GetLastLineCallInfo(out lci, out lciData);
+
+                var data = new byte[lci.dwDevSpecificSize];
+                Array.Copy(lciData, lci.dwDevSpecificOffset, data, 0, lci.dwDevSpecificSize);
                 return data;
             }
         }
@@ -2608,23 +2689,32 @@ namespace JulMar.Atapi
 
         private void GatherCallInfo()
         {
+            LINECALLINFO lci = new LINECALLINFO();
+            byte[] lciData;
             int rc, neededSize = 1024;
             do
             {
-                _lci.dwTotalSize = neededSize;
+                lci.dwTotalSize = neededSize;
                 IntPtr pLci = Marshal.AllocHGlobal(neededSize);
-                Marshal.StructureToPtr(_lci, pLci, true);
+                Marshal.StructureToPtr(lci, pLci, true);
                 rc = NativeMethods.lineGetCallInfo(_hCall, pLci);
-                Marshal.PtrToStructure(pLci, _lci);
-                if (_lci.dwNeededSize > neededSize)
+                Marshal.PtrToStructure(pLci, lci);
+                if (lci.dwNeededSize > neededSize)
                 {
-                    neededSize = _lci.dwNeededSize;
+                    neededSize = lci.dwNeededSize;
                     rc = NativeMethods.LINEERR_STRUCTURETOOSMALL;
                 }
                 else if (rc == NativeMethods.LINEERR_OK)
                 {
-                    _lciData = new byte[_lci.dwUsedSize];
-                    Marshal.Copy(pLci, _lciData, 0, _lci.dwUsedSize);
+                    lciData = new byte[lci.dwUsedSize];
+                    Marshal.Copy(pLci, lciData, 0, lci.dwUsedSize);
+
+                    // "publish" local var 
+                    lock (m_syncLci)
+                    {
+                        m_lciData = lciData;
+                        _lci = lci;
+                    }
                 }
                 Marshal.FreeHGlobal(pLci);
             }

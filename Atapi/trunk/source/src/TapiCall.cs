@@ -2689,6 +2689,9 @@ namespace JulMar.Atapi
 
         private void GatherCallInfo()
         {
+            if (_hCall.IsClosed)
+                return;
+            
             LINECALLINFO lci = new LINECALLINFO();
             byte[] lciData;
             int rc, neededSize = 1024;

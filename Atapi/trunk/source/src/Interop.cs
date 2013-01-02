@@ -82,7 +82,7 @@ namespace JulMar.Atapi.Interop
 
         protected override bool ReleaseHandle()
         {
-            if (!IsInvalid)
+            if (handle != IntPtr.Zero)
             {
                 NativeMethods.lineDeallocateCall(handle);
                 handle = IntPtr.Zero;
@@ -90,9 +90,12 @@ namespace JulMar.Atapi.Interop
             return true;
         }
 
+        /// <summary>
+        /// Fixed according to http://msdn.microsoft.com/en-us/library/system.runtime.interopservices.safehandle.isinvalid(v=vs.80).aspx
+        /// </summary>
         public override bool IsInvalid
         {
-            get { return handle == IntPtr.Zero; }
+            get { return IsClosed || handle == IntPtr.Zero; }
         }
     }
 
@@ -122,9 +125,12 @@ namespace JulMar.Atapi.Interop
             return true;
         }
 
+        /// <summary>
+        /// Fixed according to http://msdn.microsoft.com/en-us/library/system.runtime.interopservices.safehandle.isinvalid(v=vs.80).aspx
+        /// </summary>
         public override bool IsInvalid
         {
-            get { return handle == IntPtr.Zero; }
+            get { return IsClosed || handle == IntPtr.Zero; }
         }
     }
 
@@ -154,9 +160,12 @@ namespace JulMar.Atapi.Interop
             return true;
         }
 
+        /// <summary>
+        /// Fixed according to http://msdn.microsoft.com/en-us/library/system.runtime.interopservices.safehandle.isinvalid(v=vs.80).aspx
+        /// </summary>
         public override bool IsInvalid
         {
-            get { return handle == IntPtr.Zero; }
+            get { return IsClosed || handle == IntPtr.Zero; }
         }
     }
 
@@ -186,9 +195,12 @@ namespace JulMar.Atapi.Interop
             return true;
         }
 
+        /// <summary>
+        /// Fixed according to http://msdn.microsoft.com/en-us/library/system.runtime.interopservices.safehandle.isinvalid(v=vs.80).aspx
+        /// </summary>
         public override bool IsInvalid
         {
-            get { return handle == IntPtr.Zero; }
+            get { return IsClosed || handle == IntPtr.Zero; }
         }
     }
 
@@ -218,9 +230,12 @@ namespace JulMar.Atapi.Interop
             return true;
         }
 
+        /// <summary>
+        /// Fixed according to http://msdn.microsoft.com/en-us/library/system.runtime.interopservices.safehandle.isinvalid(v=vs.80).aspx
+        /// </summary>
         public override bool IsInvalid
         {
-            get { return handle == IntPtr.Zero; }
+            get { return IsClosed || handle == IntPtr.Zero; }
         }
     }
 

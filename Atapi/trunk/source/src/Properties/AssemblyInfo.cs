@@ -7,11 +7,11 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("Atapi")]
-[assembly: AssemblyDescription(".NET2 Assembly to interact with Telephony system")]
+[assembly: AssemblyDescription(".NET Assembly to interact with Telephony system")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("JulMar Technology, Inc.")]
 [assembly: AssemblyProduct("Atapi")]
-[assembly: AssemblyCopyright("Copyright © JulMar Technology, Inc. 2008-2010")]
+[assembly: AssemblyCopyright("Copyright © JulMar Technology, Inc. 2008-2013")]
 [assembly: AssemblyTrademark("ATAPI")]
 [assembly: AssemblyCulture("")]
 [assembly: CLSCompliant(true)]
@@ -33,5 +33,5 @@ using System.Runtime.InteropServices;
 //
 // You can specify all the values or you can default the Revision and Build Numbers 
 // by using the '*' as shown below:
-[assembly: AssemblyVersion("1.2.0.0")]
-[assembly: AssemblyFileVersion("1.2.0.0")]
+[assembly: AssemblyVersion("1.3.0.0")]
+[assembly: AssemblyFileVersion("1.3.0.0")]

@@ -1745,6 +1745,34 @@ namespace JulMar.Atapi
         }
         #endregion
 
+        #region phoneDevSpecific
+        /// <summary>
+        /// This method sends information to the phoneDevSpecific function
+        /// </summary>
+        /// <param name="buffer">Data to put into buffer</param>
+        public void DevSpecific(byte[] buffer) 
+        {
+            if (!IsOpen)
+                throw new InvalidOperationException("Phone is not open");
+            if (buffer == null)
+                buffer = new byte[0];
+
+            IntPtr data = Marshal.AllocHGlobal(buffer.Length);
+            if (buffer.Length > 0)
+                Marshal.Copy(buffer, 0, data, buffer.Length);
+            try
+            {
+                int rc = NativeMethods.phoneDevSpecific(Handle, data, buffer.Length);
+                if (rc < 0)
+                    throw new TapiException("phoneDevSpecific failed", rc);
+            }
+            finally
+            {
+                Marshal.FreeHGlobal(data);
+            }
+        }
+        #endregion
+
         #region phoneSetData
         /// <summary>
         /// This method sets information into the specified phone buffer location in the open phone device from

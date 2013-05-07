@@ -470,7 +470,7 @@ namespace JulMar.Atapi.Interop
         [DllImport("tapi32.dll", EntryPoint = "phoneConfigDialogW", CharSet = CharSet.Auto)]
         internal static extern int phoneConfigDialog(int dwDeviceID, IntPtr hwndOwner, string deviceClass);
 
-        [DllImport("tapi32.dll", EntryPoint = "phoneDeviceSpecific", CharSet = CharSet.Auto)]
+        [DllImport("tapi32.dll", EntryPoint = "phoneDevSpecific", CharSet = CharSet.Auto)]
         internal static extern int phoneDevSpecific(HTPHONE hPhone, IntPtr lpParams, int dwSize);
 
         [DllImport("tapi32.dll", EntryPoint = "phoneGetButtonInfoW", CharSet = CharSet.Auto)]

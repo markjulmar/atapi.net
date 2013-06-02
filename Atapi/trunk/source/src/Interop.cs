@@ -1315,6 +1315,8 @@ namespace JulMar.Atapi.Interop
             if (enc == null)
                 return string.Empty;
 
+            if ((len - offset) > (buff.Length - offset))
+                len = buff.Length - offset;
             return enc.GetString(buff, offset, len).Replace("\0", "");
         }
 

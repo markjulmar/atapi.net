@@ -179,8 +179,15 @@ namespace JulMar.Atapi
             while (rc == NativeMethods.LINEERR_STRUCTURETOOSMALL);
 
             // Assign the current country
-            if (ltc.dwCurrentLocationID < _clocations.Count)
-                _currLocation = _clocations[ltc.dwCurrentLocationID];
+            for (int index = 0; index < _clocations.Count; index++)
+            {
+                var location = _clocations[index];
+                if (ltc.dwCurrentLocationID == location.Id)
+                {
+                    _currLocation = location;
+                    break;
+                }
+            }
         }
 
         private static CallingCard ReadCallingCard(LINETRANSLATECAPS lcl, byte[] rawBuffer, int pos)

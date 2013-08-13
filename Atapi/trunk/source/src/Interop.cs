@@ -1467,7 +1467,7 @@ namespace JulMar.Atapi.Interop
         internal int dwTotalSize;
         internal int dwNeededSize;
         internal int dwUsedSize;
-        internal IntPtr hLine;
+        internal int hLine; 
         internal int dwLineDeviceID;
         internal int dwAddressID;
         internal int dwBearerMode;
@@ -1843,7 +1843,7 @@ namespace JulMar.Atapi.Interop
     [StructLayout(LayoutKind.Sequential)]
     internal struct LINEMESSAGE
     {
-        internal IntPtr hDevice;                         // TAPI v2.0
+        internal uint hDevice;                         // TAPI v2.0
         internal TapiEvent dwMessageID;                  // TAPI v2.0
         internal IntPtr dwCallbackInstance;              // TAPI v2.0
         internal IntPtr dwParam1;                        // TAPI v2.0

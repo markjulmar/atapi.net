@@ -75,8 +75,8 @@ namespace JulMar.Atapi.Interop
         {
         }
 
-        internal HTCALL(IntPtr preexistingHandle, bool ownsHandle) 
-            : base(preexistingHandle, ownsHandle)
+        internal HTCALL(uint preexistingHandle, bool ownsHandle) 
+            : base(new IntPtr((int)preexistingHandle), ownsHandle)
         {
         }
 
@@ -84,7 +84,7 @@ namespace JulMar.Atapi.Interop
         {
             if (handle != IntPtr.Zero)
             {
-                NativeMethods.lineDeallocateCall(handle);
+                NativeMethods.lineDeallocateCall((uint)handle.ToInt32());
                 handle = IntPtr.Zero;
             }
             return true;
@@ -110,8 +110,8 @@ namespace JulMar.Atapi.Interop
         {
         }
 
-        internal HTLINE(IntPtr preexistingHandle, bool ownsHandle)
-            : base(preexistingHandle, ownsHandle)
+        internal HTLINE(uint preexistingHandle, bool ownsHandle)
+            : base(new IntPtr((int)preexistingHandle), ownsHandle)
         {
         }
 
@@ -119,7 +119,7 @@ namespace JulMar.Atapi.Interop
         {
             if (handle != IntPtr.Zero)
             {
-                NativeMethods.lineClose(handle);
+                NativeMethods.lineClose((uint)handle.ToInt32());
                 handle = IntPtr.Zero;
             }
             return true;
@@ -145,8 +145,8 @@ namespace JulMar.Atapi.Interop
         {
         }
 
-        internal HTPHONE(IntPtr preexistingHandle, bool ownsHandle)
-            : base(preexistingHandle, ownsHandle)
+        internal HTPHONE(uint preexistingHandle, bool ownsHandle)
+            : base(new IntPtr((int)preexistingHandle), ownsHandle)
         {
         }
 
@@ -154,7 +154,7 @@ namespace JulMar.Atapi.Interop
         {
             if (handle != IntPtr.Zero)
             {
-                NativeMethods.phoneClose(handle);
+                NativeMethods.phoneClose((uint)handle.ToInt32());
                 handle = IntPtr.Zero;
             }
             return true;
@@ -180,8 +180,8 @@ namespace JulMar.Atapi.Interop
         {
         }
 
-        internal HTLINEAPP(IntPtr preexistingHandle, bool ownsHandle)
-            : base(preexistingHandle, ownsHandle)
+        internal HTLINEAPP(uint preexistingHandle, bool ownsHandle)
+            : base(new IntPtr((int)(int)preexistingHandle), ownsHandle)
         {
         }
 
@@ -189,7 +189,7 @@ namespace JulMar.Atapi.Interop
         {
             if (handle != IntPtr.Zero)
             {
-                NativeMethods.lineShutdown(this.handle);
+                NativeMethods.lineShutdown((uint)this.handle.ToInt32());
                 handle = IntPtr.Zero;
             }
             return true;
@@ -215,8 +215,8 @@ namespace JulMar.Atapi.Interop
         {
         }
 
-        internal HTPHONEAPP(IntPtr preexistingHandle, bool ownsHandle)
-            : base(preexistingHandle, ownsHandle)
+        internal HTPHONEAPP(uint preexistingHandle, bool ownsHandle)
+            : base(new IntPtr((int)preexistingHandle), ownsHandle)
         {
         }
 
@@ -224,7 +224,7 @@ namespace JulMar.Atapi.Interop
         {
             if (handle != IntPtr.Zero)
             {
-                NativeMethods.phoneShutdown(this.handle);
+                NativeMethods.phoneShutdown((uint)this.handle.ToInt32());
                 handle = IntPtr.Zero;
             }
             return true;
@@ -267,22 +267,22 @@ namespace JulMar.Atapi.Interop
         internal static extern int lineBlindTransfer(HTCALL hCall, string destAddress, int countryCode);
 
         [DllImport("Tapi32.dll", CharSet = CharSet.Auto)]
-        internal static extern int lineClose(IntPtr hLine);
+        internal static extern int lineClose(uint hLine);
 
         [DllImport("Tapi32.dll", CharSet = CharSet.Auto)]
         internal static extern int lineCompleteCall(HTCALL hCall, IntPtr lpCompletionId, int mode, int messageId);
 
         [DllImport("Tapi32.dll", CharSet = CharSet.Auto)]
-        internal static extern int lineCompleteTransfer(HTCALL hCall, HTCALL htConsult, out IntPtr htConfCall, int dwTransferMode);
+        internal static extern int lineCompleteTransfer(HTCALL hCall, HTCALL htConsult, out uint htConfCall, int dwTransferMode);
 
         [DllImport("tapi32.dll", EntryPoint = "lineConfigDialogW", CharSet = CharSet.Auto)]
         internal static extern int lineConfigDialog(int dwDeviceID, IntPtr hwndOwner, string lpszDeviceClass);
 
         [DllImport("Tapi32.dll", CharSet = CharSet.Auto)]
-        internal static extern int lineDeallocateCall(IntPtr hLine);
+        internal static extern int lineDeallocateCall(uint hLine);
 
         [DllImport("Tapi32.dll", CharSet = CharSet.Auto)]
-        internal static extern int lineDevSpecific(HTLINE hLine, int dwAddressID, IntPtr hCall, IntPtr lpParams, int dwSize);
+        internal static extern int lineDevSpecific(HTLINE hLine, int dwAddressID, uint hCall, IntPtr lpParams, int dwSize);
 
         [DllImport("Tapi32.dll", CharSet = CharSet.Auto)]
         internal static extern int lineDevSpecificFeature(HTLINE hLine, int dwFeature, IntPtr lpParams, int dwSize);
@@ -294,7 +294,7 @@ namespace JulMar.Atapi.Interop
         internal static extern int lineDrop(HTCALL hCall, byte[] UserInfo, int dwSize);
 
         [DllImport("Tapi32.dll", EntryPoint="lineForwardW", CharSet = CharSet.Auto)]
-        internal static extern int lineForward(HTLINE hLine, int bAllAddresses, int dwAddressID, IntPtr lpForwardList, int dwNumRingsNoAnswer, out IntPtr lphConsultCall, IntPtr lpCallParams);
+        internal static extern int lineForward(HTLINE hLine, int bAllAddresses, int dwAddressID, IntPtr lpForwardList, int dwNumRingsNoAnswer, out uint lphConsultCall, IntPtr lpCallParams);
 
         [DllImport("Tapi32.dll", CharSet = CharSet.Auto)]
         internal static extern int lineGatherDigits(HTCALL hCall, int dwDigitModes, out StringBuilder buffer, int numDigits, string termDigits, int firstDigitTimeout, int interDigitTimeout);
@@ -357,10 +357,10 @@ namespace JulMar.Atapi.Interop
         internal static extern int lineHold(HTCALL hCall);
 
         [DllImport("Tapi32.dll", EntryPoint = "lineInitializeExW", CharSet = CharSet.Auto)]
-        internal static extern int lineInitializeEx(out IntPtr hLineApp, IntPtr hAppHandle, TapiEventCallback CalllBack, string friendlyAppName, out int numDevices, ref int apiVersion, ref LINEINITIALIZEEXPARAMS lineExParms);
+        internal static extern int lineInitializeEx(out uint hLineApp, IntPtr hAppHandle, TapiEventCallback CalllBack, string friendlyAppName, out int numDevices, ref int apiVersion, ref LINEINITIALIZEEXPARAMS lineExParms);
 
         [DllImport("Tapi32.dll", EntryPoint = "lineMakeCallW", CharSet = CharSet.Auto)]
-        internal static extern int lineMakeCall(HTLINE hLine, out IntPtr hCall, string DestAddress, int CountryCode, IntPtr lpCallParams);
+        internal static extern int lineMakeCall(HTLINE hLine, out uint hCall, string DestAddress, int CountryCode, IntPtr lpCallParams);
 
         [DllImport("Tapi32.dll", CharSet = CharSet.Auto)]
         internal static extern int lineNegotiateAPIVersion(HTLINEAPP hLineApp, int dwDeviceID, int dwAPILowVersion, int dwAPIHighVersion, out int lpdwAPIVersion, out LINEEXTENSIONID lpExtensionID);
@@ -369,7 +369,7 @@ namespace JulMar.Atapi.Interop
         internal static extern int lineNegotiateExtVersion(HTLINEAPP hLineApp, int dwDeviceID, int dwAPIVersion, int dwExtLowVersion, int dwExtHighVersion, out int dwExtVersion);
 
         [DllImport("Tapi32.dll", EntryPoint = "lineOpenW", CharSet = CharSet.Auto)]
-        internal static extern int lineOpen(HTLINEAPP hLineApp, int dwDeviceID, out IntPtr hLine, int dwAPIVersion, int dwExtVersion, IntPtr dwCallbackInstance, int dwPrivileges, int dwMediaModes, ref LINECALLPARAMS lpCallParams);
+        internal static extern int lineOpen(HTLINEAPP hLineApp, int dwDeviceID, out uint hLine, int dwAPIVersion, int dwExtVersion, IntPtr dwCallbackInstance, int dwPrivileges, int dwMediaModes, ref LINECALLPARAMS lpCallParams);
 
         [DllImport("Tapi32.dll", CharSet = CharSet.Auto)]
         internal static extern int lineMonitorDigits(HTCALL hCall, int digitModes);
@@ -384,10 +384,10 @@ namespace JulMar.Atapi.Interop
         internal static extern int linePark(HTCALL hCall, int parkMode, string address, IntPtr ndAddress);
 
         [DllImport("Tapi32.dll", EntryPoint = "linePickupW", CharSet = CharSet.Auto)]
-        internal static extern int linePickup(HTLINE hLine, int addressId, out IntPtr hCall, string destAddress, string groupId);
+        internal static extern int linePickup(HTLINE hLine, int addressId, out uint hCall, string destAddress, string groupId);
 
         [DllImport("Tapi32.dll", CharSet = CharSet.Auto)]
-        internal static extern int linePrepareAddToConference(HTCALL hConfCall, out IntPtr hConsultCall, IntPtr lpCallParams);
+        internal static extern int linePrepareAddToConference(HTCALL hConfCall, out uint hConsultCall, IntPtr lpCallParams);
 
         [DllImport("Tapi32.dll", EntryPoint = "lineRedirectW", CharSet = CharSet.Auto)]
         internal static extern int lineRedirect(HTCALL hCall, string address, int countryCode);
@@ -438,13 +438,13 @@ namespace JulMar.Atapi.Interop
         internal static extern int lineSetStatusMessages(HTLINE hLine, int dwLineStates, int dwAddressStates);
 
         [DllImport("Tapi32.dll", CharSet = CharSet.Auto)]
-        internal static extern int lineSetupConference(HTCALL hCall, HTLINE hLine, out IntPtr htConferenceCall, out IntPtr htConsultCall, int dwNumParties, IntPtr lpCallParams);
+        internal static extern int lineSetupConference(HTCALL hCall, HTLINE hLine, out uint htConferenceCall, out uint htConsultCall, int dwNumParties, IntPtr lpCallParams);
 
         [DllImport("Tapi32.dll", CharSet = CharSet.Auto)]
-        internal static extern int lineSetupTransfer(HTCALL hCall, out IntPtr htConsultCall, IntPtr lpCallParams);
+        internal static extern int lineSetupTransfer(HTCALL hCall, out uint htConsultCall, IntPtr lpCallParams);
 
         [DllImport("Tapi32.dll", CharSet = CharSet.Auto), ReliabilityContract(Consistency.WillNotCorruptState, Cer.Success)]
-        internal static extern int lineShutdown(IntPtr hTapi);
+        internal static extern int lineShutdown(uint hTapi);
 
         [DllImport("Tapi32.dll", CharSet = CharSet.Auto)]
         internal static extern int lineSwapHold(HTCALL hCall, HTCALL otherCall);
@@ -462,10 +462,10 @@ namespace JulMar.Atapi.Interop
         internal static extern int lineUnhold(HTCALL hCall);
 
         [DllImport("tapi32.dll", EntryPoint = "lineUnparkW", CharSet = CharSet.Auto)]
-        internal static extern int lineUnpark(HTLINE hLine, int addressID, out IntPtr hCall, string parkAddress);
+        internal static extern int lineUnpark(HTLINE hLine, int addressID, out uint hCall, string parkAddress);
 
         [DllImport("tapi32.dll", EntryPoint = "phoneClose", CharSet = CharSet.Auto)]
-        internal static extern int phoneClose(IntPtr hPhone);
+        internal static extern int phoneClose(uint hPhone);
 
         [DllImport("tapi32.dll", EntryPoint = "phoneConfigDialogW", CharSet = CharSet.Auto)]
         internal static extern int phoneConfigDialog(int dwDeviceID, IntPtr hwndOwner, string deviceClass);
@@ -513,7 +513,7 @@ namespace JulMar.Atapi.Interop
         internal static extern int phoneGetVolume(HTPHONE hPhone, int dwHookSwitchDev, ref int lpdwVolume);
 
         [DllImport("Tapi32.dll", EntryPoint = "phoneInitializeExW", CharSet = CharSet.Auto)]
-        internal static extern int phoneInitializeEx(out IntPtr hPhoneApp, IntPtr hAppHandle, TapiEventCallback CalllBack, string friendlyAppName, out int numDevices, ref int apiVersion, ref PHONEINITIALIZEEXPARAMS phoneExParms);
+        internal static extern int phoneInitializeEx(out uint hPhoneApp, uint hAppHandle, TapiEventCallback CalllBack, string friendlyAppName, out int numDevices, ref int apiVersion, ref PHONEINITIALIZEEXPARAMS phoneExParms);
 
         [DllImport("Tapi32.dll", CharSet = CharSet.Auto)]
         internal static extern int phoneNegotiateAPIVersion(HTPHONEAPP hPhoneApp, int dwDeviceID, int dwAPILowVersion, int dwAPIHighVersion, out int lpdwAPIVersion, out PHONEEXTENSIONID lpExtensionID);
@@ -522,7 +522,7 @@ namespace JulMar.Atapi.Interop
         internal static extern int phoneNegotiateExtVersion(HTPHONEAPP hPhoneApp, int dwDeviceID, int dwAPIVersion, int dwExtLowVersion, int dwExtHighVersion, out int dwExtVersion);
 
         [DllImport("Tapi32.dll", CharSet = CharSet.Auto)]
-        internal static extern int phoneOpen(HTPHONEAPP hPhoneApp, int dwDeviceID, out IntPtr hPhone, int dwAPIVersion, int dwExtVersion, IntPtr dwCallbackInstance, int dwPrivileges);
+        internal static extern int phoneOpen(HTPHONEAPP hPhoneApp, int dwDeviceID, out uint hPhone, int dwAPIVersion, int dwExtVersion, IntPtr dwCallbackInstance, int dwPrivileges);
 
         [DllImport("Tapi32.dll", EntryPoint = "phoneSetButtonInfoW", CharSet = CharSet.Auto)]
         internal static extern int phoneSetButtonInfo(HTPHONE hPhone, int dwButtonLampID, IntPtr lpButtonInfo);
@@ -552,7 +552,7 @@ namespace JulMar.Atapi.Interop
         internal static extern int phoneSetVolume(HTPHONE hPhone, int dwHookSwitchDev, int dwVolume);
 
         [DllImport("Tapi32.dll", CharSet = CharSet.Auto), ReliabilityContract(Consistency.WillNotCorruptState, Cer.Success)]
-        internal static extern int phoneShutdown(IntPtr hTapi);
+        internal static extern int phoneShutdown(uint hTapi);
 
         #endregion
 
@@ -1843,7 +1843,7 @@ namespace JulMar.Atapi.Interop
     [StructLayout(LayoutKind.Sequential)]
     internal struct LINEMESSAGE
     {
-        internal uint hDevice;                         // TAPI v2.0
+        internal uint hDevice;                           // TAPI v2.0
         internal TapiEvent dwMessageID;                  // TAPI v2.0
         internal IntPtr dwCallbackInstance;              // TAPI v2.0
         internal IntPtr dwParam1;                        // TAPI v2.0

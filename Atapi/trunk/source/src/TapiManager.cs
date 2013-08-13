@@ -153,7 +153,7 @@ namespace JulMar.Atapi
             parms.dwCompletionKey = 0;
             parms.hEvent = IntPtr.Zero;
 
-            int numDevices; IntPtr hTapi;
+            int numDevices; uint hTapi;
 
             int rc = NativeMethods.lineInitializeEx(out hTapi, IntPtr.Zero, null, _appName,
                     out numDevices, ref _lineVersion, ref parms);
@@ -191,9 +191,9 @@ namespace JulMar.Atapi
             parms.dwCompletionKey = 0;
             parms.hEvent = IntPtr.Zero;
 
-            int numDevices; IntPtr hTapi;
+            int numDevices; uint hTapi;
 
-            int rc = NativeMethods.phoneInitializeEx(out hTapi, IntPtr.Zero, null, _appName,
+            int rc = NativeMethods.phoneInitializeEx(out hTapi, 0, null, _appName,
                     out numDevices, ref _phoneVersion, ref parms);
             if (rc == NativeMethods.PHONEERR_OK)
             {
@@ -494,21 +494,21 @@ namespace JulMar.Atapi
             {
                 case TapiEvent.LINE_CALLSTATE:
                     {
-                        TapiCall call = TapiCall.FindCallByHandle(new IntPtr(msg.hDevice));
+                        TapiCall call = TapiCall.FindCallByHandle(msg.hDevice);
                         if (call != null)
                             call.OnCallStateChange(msg.dwParam1.ToInt32(), msg.dwParam2, (MediaModes)msg.dwParam3.ToInt32());
                     }
                     break;
                 case TapiEvent.LINE_CALLINFO:
                     {
-                        TapiCall call = TapiCall.FindCallByHandle(new IntPtr(msg.hDevice));
+                        TapiCall call = TapiCall.FindCallByHandle(msg.hDevice);
                         if (call != null)
                             call.OnCallInfoChange(msg.dwParam1.ToInt32());
                     }
                     break;
                 case TapiEvent.LINE_GATHERDIGITS:
                     {
-                        TapiCall call = TapiCall.FindCallByHandle(new IntPtr(msg.hDevice));
+                        TapiCall call = TapiCall.FindCallByHandle(msg.hDevice);
                         if (call != null)
                             call.OnGatherDigitsComplete(msg.dwParam1.ToInt32());
                     }
@@ -516,7 +516,7 @@ namespace JulMar.Atapi
 
                 case TapiEvent.LINE_GENERATE:
                     {
-                        TapiCall call = TapiCall.FindCallByHandle(new IntPtr(msg.hDevice));
+                        TapiCall call = TapiCall.FindCallByHandle(msg.hDevice);
                         if (call != null)
                             call.OnGenerateDigitsOrToneComplete(msg.dwParam1.ToInt32());
                     }
@@ -524,7 +524,7 @@ namespace JulMar.Atapi
 
                 case TapiEvent.LINE_MONITORDIGITS:
                     {
-                        TapiCall call = TapiCall.FindCallByHandle(new IntPtr(msg.hDevice));
+                        TapiCall call = TapiCall.FindCallByHandle(msg.hDevice);
                         if (call != null)
                             call.OnDigitDetected(msg.dwParam1.ToInt32(), msg.dwParam2.ToInt32());
                     }
@@ -532,7 +532,7 @@ namespace JulMar.Atapi
 
                 case TapiEvent.LINE_MONITORMEDIA:
                     {
-                        TapiCall call = TapiCall.FindCallByHandle(new IntPtr(msg.hDevice));
+                        TapiCall call = TapiCall.FindCallByHandle(msg.hDevice);
                         if (call != null)
                             call.OnMediaModeDetected((MediaModes)msg.dwParam1.ToInt32());
                     }
@@ -540,7 +540,7 @@ namespace JulMar.Atapi
 
                 case TapiEvent.LINE_MONITORTONE:
                     {
-                        TapiCall call = TapiCall.FindCallByHandle(new IntPtr(msg.hDevice));
+                        TapiCall call = TapiCall.FindCallByHandle(msg.hDevice);
                         if (call != null)
                             call.OnToneDetected(msg.dwParam1.ToInt32());
                     }
@@ -556,7 +556,7 @@ namespace JulMar.Atapi
 
                 case TapiEvent.LINE_DEVSPECIFIC:
                     {
-                        TapiCall call = TapiCall.FindCallByHandle(new IntPtr(msg.hDevice));
+                        TapiCall call = TapiCall.FindCallByHandle(msg.hDevice);
                         if (call != null)
                             call.Line.OnDeviceSpecific(call, msg.dwParam1, msg.dwParam2, msg.dwParam3);
                         else

@@ -1576,7 +1576,7 @@ namespace JulMar.Atapi
             if (IsOpen)
                 throw new TapiException("Phone is already open", NativeMethods.PHONEERR_OPERATIONUNAVAIL);
 
-            IntPtr hPhone;
+            uint hPhone;
             int rc = NativeMethods.phoneOpen(_mgr.PhoneHandle, _deviceId, out hPhone, _negotiatedVersion, _negotiatedExtVersion,
                 Marshal.GetFunctionPointerForDelegate(_pcb), privilege);
 

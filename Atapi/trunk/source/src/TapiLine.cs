@@ -1176,7 +1176,7 @@ namespace JulMar.Atapi
             }
             mediaMode &= Capabilities.MediaModes;
 
-            IntPtr hLine;
+            uint hLine;
             int rc = NativeMethods.lineOpen(_mgr.LineHandle, _deviceId, out hLine, _negotiatedVersion, _negotiatedExtVersion,
                 Marshal.GetFunctionPointerForDelegate(_lcb), privilege, (int) mediaMode, ref lcp);
 
@@ -1385,7 +1385,7 @@ namespace JulMar.Atapi
             try
             {
                 lpCp = MakeCallParams.ProcessCallParams(0, param, 0);
-                IntPtr hCall;
+                uint hCall;
 
                 int rc = NativeMethods.lineForward(Handle, 1, 0, fwdList, numRingsNoAnswer, out hCall, lpCp);
                 if (rc < 0)
@@ -1400,7 +1400,7 @@ namespace JulMar.Atapi
                     if (req.Result < 0)
                         throw new TapiException("lineForward failed", req.Result);
 
-                    if (hCall != IntPtr.Zero)
+                    if (hCall != 0)
                     {
                         var call = new TapiCall(this, hCall);
                         TapiAddress addrOwner = call.Address;
@@ -1425,7 +1425,7 @@ namespace JulMar.Atapi
         /// </summary>
         public void CancelForward()
         {
-            IntPtr hCall;
+            uint hCall;
             int rc = NativeMethods.lineForward(Handle, 1, 0, IntPtr.Zero, 0, out hCall, IntPtr.Zero);
             if (rc < 0)
                 throw new TapiException("lineForward failed", rc);
@@ -1438,7 +1438,7 @@ namespace JulMar.Atapi
             {
                 if (req.Result < 0)
                     throw new TapiException("lineForward failed", req.Result);
-                if (hCall != IntPtr.Zero)
+                if (hCall != 0)
                     NativeMethods.lineDeallocateCall(hCall);
             }
         }
@@ -1663,7 +1663,7 @@ namespace JulMar.Atapi
                     break;
 
                 case TapiEvent.LINE_APPNEWCALL:
-                    HandleNewCall(new TapiCall(_addresses[dwParam1.ToInt32()], dwParam2), dwParam3.ToInt32());
+                    HandleNewCall(new TapiCall(_addresses[dwParam1.ToInt32()], (uint)dwParam2.ToInt32()), dwParam3.ToInt32());
                     break;
 
                 case TapiEvent.LINE_DEVSPECIFIC:

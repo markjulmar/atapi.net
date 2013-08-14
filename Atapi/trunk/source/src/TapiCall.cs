@@ -2,7 +2,7 @@
 //
 // This is a part of the TAPI Applications Classes .NET library (ATAPI)
 //
-// Copyright (c) 2005-2010 JulMar Technology, Inc.
+// Copyright (c) 2005-2013 JulMar Technology, Inc.
 // Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
 // documentation files (the "Software"), to deal in the Software without restriction, including without limitation 
 // the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and 
@@ -15,13 +15,14 @@
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using System;
+using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Collections.Generic;
 using System.Reflection;
 using JulMar.Atapi.Interop;
 using System.Globalization;
-using System.Threading;
+using System.Diagnostics;
 
 namespace JulMar.Atapi
 {
@@ -324,7 +325,7 @@ namespace JulMar.Atapi
         /// <summary>
         /// used to synchronize mutex access to last LINECALLINFO data 
         /// </summary>
-        private readonly object m_syncLci = new object();
+        private readonly object _syncLci = new object();
 
         /// <summary>
         /// Store last LINECALLINFO instance retrieved in <see cref="GatherCallInfo()"/>.
@@ -332,17 +333,17 @@ namespace JulMar.Atapi
         /// <remarks>Access to this ref is allowed only to read a single members at once.
         /// If more than one members has to read ad once, use GetLastLineCallInfo()/></remarks>
         private LINECALLINFO _lci = new LINECALLINFO();
-        private byte[] m_lciData;
+        private byte[] _lciData;
 
         /// <summary>
         /// Safely returns a copy to last LINECALLINFO and its byte[] data
         /// </summary>
-        private void GetLastLineCallInfo(out LINECALLINFO lci, out byte[] lci_data)
+        private void GetLastLineCallInfo(out LINECALLINFO lci, out byte[] lciData)
         {
-            lock (m_syncLci)
+            lock (_syncLci)
             {
                 lci = _lci;
-                lci_data = m_lciData;
+                lciData = _lciData;
             }
         }
 
@@ -419,7 +420,7 @@ namespace JulMar.Atapi
         {
             lock (CallsMap)
             {
-                TapiCall theCall = null;
+                TapiCall theCall;
                 if (CallsMap.TryGetValue(htCall, out theCall))
                 {
                     return theCall;
@@ -1419,9 +1420,9 @@ namespace JulMar.Atapi
 
         internal void OnGatherDigitsComplete(int reason)
         {
-            System.Diagnostics.Debug.Assert(_gdreqId != 0 && _sbDigits != null);
+            Debug.Assert(_gdreqId != 0 && _sbDigits != null);
             if (_gdreqId != 0)
-                TapiManager.HandleCompletion(_gdreqId, reason);
+                TapiManager.HandleCompletion(_gdreqId, new IntPtr(reason));
         }
 
         /// <summary>
@@ -1768,43 +1769,50 @@ namespace JulMar.Atapi
         }
 
         /// <summary>
+        /// Returns a device ID handle from an identifier.
+        /// </summary>
+        /// <param name="identifier">Identifier to lookup</param>
+        /// <returns>Handle or null</returns>
+        public int? GetDeviceID(string identifier)
+        {
+            var buffer = (byte[])GetExternalDeviceInfo(identifier);
+            return buffer == null || buffer.Length == 0 ? (int?) null : BitConverter.ToInt32(buffer, 0);
+        }
+
+        /// <summary>
         /// Returns the device id for the wave input device.  This identifier may be passed to "waveInOpen" to get a HWAVE handle.
         /// </summary>
         /// <returns>Wave Device identifier</returns>
-        public int GetWaveInDeviceID()
+        public int? GetWaveInDeviceID()
         {
-            var buffer = (byte[])GetExternalDeviceInfo("wave/in");
-            return (buffer != null && buffer.Length > 0) ? BitConverter.ToInt32(buffer, 0) : -1;
+            return GetDeviceID("wave/in");
         }
 
         /// <summary>
         /// Returns the device id for the wave output device.  This identifier may be passed to "waveOutOpen" to get a HWAVE handle.
         /// </summary>
         /// <returns>Wave Device identifier</returns>
-        public int GetWaveOutDeviceID()
+        public int? GetWaveOutDeviceID()
         {
-            var buffer = (byte[])GetExternalDeviceInfo("wave/out");
-            return (buffer != null && buffer.Length > 0) ? BitConverter.ToInt32(buffer, 0) : -1;
+            return GetDeviceID("wave/out");
         }
 
         /// <summary>
         /// Returns the device id for the MIDI input device.  This identifier may be passed to "midiInOpen" to get a HMIDI handle.
         /// </summary>
         /// <returns>MIDI Device identifier</returns>
-        public int GetMidiInDeviceID()
+        public int? GetMidiInDeviceID()
         {
-            var buffer = (byte[])GetExternalDeviceInfo("midi/in");
-            return (buffer != null && buffer.Length > 0) ? BitConverter.ToInt32(buffer, 0) : -1;
+            return GetDeviceID("midi/in");
         }
 
         /// <summary>
         /// Returns the device id for the MIDI output device.  This identifier may be passed to "midiOutOpen" to get a HMIDI handle.
         /// </summary>
         /// <returns>MIDI Device identifier</returns>
-        public int GetMidiOutDeviceID()
+        public int? GetMidiOutDeviceID()
         {
-            var buffer = (byte[])GetExternalDeviceInfo("midi/out");
-            return (buffer != null && buffer.Length > 0) ? BitConverter.ToInt32(buffer, 0) : -1;
+            return GetDeviceID("midi/out");
         }
         #endregion
 
@@ -2562,11 +2570,7 @@ namespace JulMar.Atapi
             var rCalls = new List<TapiCall>();
             lock (CallsMap)
             {
-                foreach (TapiCall call in CallsMap.Values)
-                {
-                    if (call.Id == callId)
-                        rCalls.Add(call);
-                }
+                rCalls.AddRange(CallsMap.Values.Where(call => call.Id == callId));
             }
             return rCalls.ToArray();
         }
@@ -2709,9 +2713,9 @@ namespace JulMar.Atapi
                     Marshal.Copy(pLci, lciData, 0, lci.dwUsedSize);
 
                     // "publish" local var 
-                    lock (m_syncLci)
+                    lock (_syncLci)
                     {
-                        m_lciData = lciData;
+                        _lciData = lciData;
                         _lci = lci;
                     }
                 }
@@ -2732,9 +2736,9 @@ namespace JulMar.Atapi
         internal void OnGenerateDigitsOrToneComplete(int reason)
         {
             int id = System.Threading.Interlocked.Exchange(ref _gtdreqId, 0);
-            System.Diagnostics.Debug.Assert(id != 0);
+            Debug.Assert(id != 0);
             if (id != 0)
-                TapiManager.HandleCompletion(id, reason);
+                TapiManager.HandleCompletion(id, new IntPtr(reason));
         }
 
 

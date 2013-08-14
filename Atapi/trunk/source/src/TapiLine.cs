@@ -2,7 +2,7 @@
 //
 // This is a part of the TAPI Applications Classes .NET library (ATAPI)
 //
-// Copyright (c) 2005-2010 JulMar Technology, Inc.
+// Copyright (c) 2005-2013 JulMar Technology, Inc.
 // Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
 // documentation files (the "Software"), to deal in the Software without restriction, including without limitation 
 // the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and 
@@ -15,6 +15,7 @@
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using System;
+using System.Linq;
 using System.Text;
 using System.Runtime.InteropServices;
 using System.Collections.Generic;
@@ -813,7 +814,7 @@ namespace JulMar.Atapi
 		{
             _mgr = mgr;
 			_deviceId = deviceId;
-            _lcb = new TapiEventCallback(LineCallback);
+            _lcb = LineCallback;
 
             LINEEXTENSIONID extId;
             int rc = NativeMethods.lineNegotiateAPIVersion(_mgr.LineHandle, _deviceId, 
@@ -883,7 +884,7 @@ namespace JulMar.Atapi
 
             if (!IsOpen)
             {
-                _status = new LineStatus(this, lds, rawBuffer);
+                _status = new LineStatus(this, lds, null);
                 return;
             }
 
@@ -1017,13 +1018,7 @@ namespace JulMar.Atapi
         /// <returns>Call Count</returns>
         public int TotalCallCount
         {
-            get
-            {
-                int count = 0;
-                foreach (TapiAddress addr in _addresses)
-                    count += addr.Calls.Length;
-                return count;
-            }
+            get { return _addresses.Sum(addr => addr.Calls.Length); }
         }
 
         /// <summary>
@@ -1033,16 +1028,7 @@ namespace JulMar.Atapi
         /// <returns>TapiCall object</returns>
         public TapiCall GetCallById(int callId)
         {
-            foreach (TapiAddress addr in _addresses)
-            {
-                TapiCall[] calls = addr.Calls;
-                foreach (TapiCall call in calls)
-                {
-                    if (call.Id == callId)
-                        return call;
-                }
-            }
-            return null;
+            return _addresses.SelectMany(addr => addr.Calls).FirstOrDefault(call => call.Id == callId);
         }
 
         /// <summary>
@@ -1054,11 +1040,7 @@ namespace JulMar.Atapi
             var calls = new List<TapiCall>();
             foreach (TapiAddress addr in _addresses)
             {
-                foreach (TapiCall call in addr.Calls)
-                {
-                    if (!calls.Contains(call))
-                        calls.Add(call);
-                }
+                calls.AddRange(addr.Calls.Where(call => !calls.Contains(call)));
             }
             return calls.ToArray();
         }
@@ -1070,12 +1052,7 @@ namespace JulMar.Atapi
         /// <returns>TapiAddress or null if not found.</returns>
         public TapiAddress FindAddress(string number)
         {
-            foreach (TapiAddress addr in _addresses)
-            {
-                if (string.Compare(addr.Address, number, true, CultureInfo.InvariantCulture) == 0)
-                    return addr;
-            }
-            return null;
+            return _addresses.FirstOrDefault(addr => string.Compare(addr.Address, number, true, CultureInfo.InvariantCulture) == 0);
         }
 
         /// <summary>
@@ -1244,7 +1221,7 @@ namespace JulMar.Atapi
         /// <returns><see cref="TapiCall"/> object or null.</returns>
         public TapiCall MakeCall(string address)
         {
-            return this.MakeCall(address, null, null);
+            return MakeCall(address, null, null);
         }
 
         /// <summary>
@@ -1256,13 +1233,12 @@ namespace JulMar.Atapi
         /// <returns><see cref="TapiCall"/> object or null.</returns>
         public TapiCall MakeCall(string address, Country country, MakeCallParams param)
         {
-            foreach (TapiAddress addr in Addresses)
-            {
-                if (addr.Status.CanMakeCall)
-                    return addr.MakeCall(address, (country == null) ? 0 : country.CountryCode, param);
-            }
-            return null;
+            return (from addr in Addresses 
+                    where addr.Status.CanMakeCall 
+                    select addr.MakeCall(address, (country == null) ? 0 : country.CountryCode, param)
+                    ).FirstOrDefault();
         }
+
         #endregion
 
         #region lineUncompleteCall
@@ -1490,43 +1466,50 @@ namespace JulMar.Atapi
         }
 
         /// <summary>
+        /// Returns a device ID handle from an identifier.
+        /// </summary>
+        /// <param name="identifier">Identifier to lookup</param>
+        /// <returns>Handle or null</returns>
+        public int? GetDeviceID(string identifier)
+        {
+            var buffer = (byte[])GetExternalDeviceInfo(identifier);
+            return buffer == null || buffer.Length == 0 ? (int?)null : BitConverter.ToInt32(buffer, 0);
+        }
+
+        /// <summary>
         /// Returns the device id for the wave input device.  This identifier may be passed to "waveInOpen" to get a HWAVE handle.
         /// </summary>
         /// <returns>Wave Device identifier</returns>
-        public int GetWaveInDeviceID()
+        public int? GetWaveInDeviceID()
         {
-            var buffer = (byte[])GetExternalDeviceInfo("wave/in");
-            return (buffer != null && buffer.Length > 0) ? BitConverter.ToInt32(buffer, 0) : -1;
+            return GetDeviceID("wave/in");
         }
 
         /// <summary>
         /// Returns the device id for the wave output device.  This identifier may be passed to "waveOutOpen" to get a HWAVE handle.
         /// </summary>
         /// <returns>Wave Device identifier</returns>
-        public int GetWaveOutDeviceID()
+        public int? GetWaveOutDeviceID()
         {
-            var buffer = (byte[])GetExternalDeviceInfo("wave/out");
-            return (buffer != null && buffer.Length > 0) ? BitConverter.ToInt32(buffer, 0) : -1;
+            return GetDeviceID("wave/out");
         }
 
         /// <summary>
         /// Returns the device id for the MIDI input device.  This identifier may be passed to "midiInOpen" to get a HMIDI handle.
         /// </summary>
-        /// <returns>Wave Device identifier</returns>
-        public int GetMidiInDeviceID()
+        /// <returns>MIDI Device identifier</returns>
+        public int? GetMidiInDeviceID()
         {
-            var buffer = (byte[])GetExternalDeviceInfo("midi/in");
-            return (buffer != null && buffer.Length > 0) ? BitConverter.ToInt32(buffer, 0) : -1;
+            return GetDeviceID("midi/in");
         }
 
         /// <summary>
         /// Returns the device id for the MIDI output device.  This identifier may be passed to "midiOutOpen" to get a HMIDI handle.
         /// </summary>
         /// <returns>MIDI Device identifier</returns>
-        public int GetMidiOutDeviceID()
+        public int? GetMidiOutDeviceID()
         {
-            var buffer = (byte[])GetExternalDeviceInfo("midi/out");
-            return (buffer != null && buffer.Length > 0) ? BitConverter.ToInt32(buffer, 0) : -1;
+            return GetDeviceID("midi/out");
         }
 
         /// <summary>
@@ -1541,11 +1524,7 @@ namespace JulMar.Atapi
                 if (buffer != null && buffer.Length > 0)
                 {
                     int deviceId = BitConverter.ToInt32(buffer, 0);
-                    foreach (TapiPhone phone in _mgr.Phones)
-                    {
-                        if (phone.Id == deviceId)
-                            return phone;
-                    }
+                    return _mgr.Phones.FirstOrDefault(phone => phone.Id == deviceId);
                 }
             }
             return null;
@@ -1733,8 +1712,8 @@ namespace JulMar.Atapi
             }
             else if (notificationType == NativeMethods.LINEDEVSTATE_COMPLCANCEL)
             {
-                int completionId = p2.ToInt32();
                 //TODO:
+                //int completionId = p2.ToInt32();
             }
             else if (notificationType == NativeMethods.LINEDEVSTATE_REINIT)
             {

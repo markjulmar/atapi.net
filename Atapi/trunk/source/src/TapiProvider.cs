@@ -2,7 +2,7 @@
 //
 // This is a part of the TAPI Applications Classes .NET library (ATAPI)
 //
-// Copyright (c) 2005-2010 JulMar Technology, Inc.
+// Copyright (c) 2005-2013 JulMar Technology, Inc.
 // Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
 // documentation files (the "Software"), to deal in the Software without restriction, including without limitation 
 // the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and 
@@ -21,30 +21,21 @@ namespace JulMar.Atapi
     /// </summary>
     public class TapiProvider
     {
-        readonly string _name;
-        readonly int _id;
-
         internal TapiProvider(int id, string name)
         {
-            _id = id;
-            _name = name;
+            Id = id;
+            Name = name;
         }
 
         /// <summary>
         /// The name of the TSP
         /// </summary>
-        public string Name
-        {
-            get { return _name; }
-        }
+        public string Name { get; private set; }
 
         /// <summary>
         /// The permanent provider ID
         /// </summary>
-        public int Id
-        {
-            get { return _id; }
-        }
+        public int Id { get; private set; }
 
         /// <summary>
         /// Override to return the provider name
@@ -52,7 +43,7 @@ namespace JulMar.Atapi
         /// <returns>String with provider name</returns>
         public override string ToString()
         {
-            return _name;
+            return Name;
         }
     }
 }

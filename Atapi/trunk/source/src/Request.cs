@@ -2,7 +2,7 @@
 //
 // This is a part of the TAPI Applications Classes .NET library (ATAPI)
 //
-// Copyright (c) 2005-2010 JulMar Technology, Inc.
+// Copyright (c) 2005-2013 JulMar Technology, Inc.
 // Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
 // documentation files (the "Software"), to deal in the Software without restriction, including without limitation 
 // the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and 
@@ -25,14 +25,9 @@ namespace JulMar.Atapi
     /// </summary>
     internal class PendingTapiRequest : IAsyncResult
     {
-        private readonly int _requestId;
         private readonly Stopwatch _timeStarted = new Stopwatch();
-        private int _result;
-        private readonly ManualResetEvent _completedEvent = new ManualResetEvent(false);
-        private readonly object _state;
         private readonly AsyncCallback _callback;
-        private readonly IntPtr _apiData;
-        private readonly int _size;
+        private readonly ManualResetEvent _asyncWaitHandle;
 
         internal PendingTapiRequest(int reqId, AsyncCallback acb, object state)
             : this(reqId, acb, state, IntPtr.Zero, 0)
@@ -41,48 +36,35 @@ namespace JulMar.Atapi
 
         internal PendingTapiRequest(int reqId, AsyncCallback acb, object state, IntPtr apiData, int size)
         {
-            _requestId = reqId;
+            _asyncWaitHandle = new ManualResetEvent(false);
+            AsyncRequestId = reqId;
             _timeStarted.Start();
             _callback = acb;
-            _state = state;
-            _apiData = apiData;
-            _size = size;
+            AsyncState = state;
+            ApiData = apiData;
+            ApiDataSize = size;
 
             if (reqId == 0)
             {
                 _timeStarted.Stop();
-                _completedEvent.Set();
+                _asyncWaitHandle.Set();
             }
         }
 
-        internal int AsyncRequestId
-        {
-            get { return _requestId; }
-        }
-
-        internal IntPtr ApiData
-        {
-            get { return _apiData; }
-        }
-
-        internal int ApiDataSize
-        {
-            get { return _size; }
-        }
+        internal int AsyncRequestId { get; private set; }
+        internal IntPtr ApiData { get; private set; }
+        internal int ApiDataSize { get; private set; }
 
         /// <summary>
         /// Result code from request
         /// </summary>
-        public int Result
-        {
-            get { return _result; }
-        }
+        public long Result { get; private set; }
 
-        internal void CompleteRequest(int rc)
+        internal void CompleteRequest(long resultCode)
         {
-            _result = rc;
+            Result = resultCode;
             _timeStarted.Stop();
-            _completedEvent.Set();
+            _asyncWaitHandle.Set();
             if (_callback != null)
                 _callback.BeginInvoke(this, ar => _callback.EndInvoke(ar), null);
         }
@@ -106,27 +88,24 @@ namespace JulMar.Atapi
         /// <summary>
         /// Async state object
         /// </summary>
-        public object AsyncState
-        {
-            get { return _state; }
-        }
+        public object AsyncState { get; private set; }
 
         /// <summary>
         /// Async Wait Handle
         /// </summary>
         public WaitHandle AsyncWaitHandle
         {
-            get { return _completedEvent; }
+            get { return _asyncWaitHandle; }
         }
 
         bool IAsyncResult.CompletedSynchronously
         {
-            get { return (_requestId == 0); }
+            get { return (AsyncRequestId == 0); }
         }
 
         bool IAsyncResult.IsCompleted
         {
-            get { return _completedEvent.WaitOne(0, true); }
+            get { return AsyncWaitHandle.WaitOne(0, true); }
         }
     }
 }

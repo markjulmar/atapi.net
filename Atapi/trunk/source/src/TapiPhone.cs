@@ -2,7 +2,7 @@
 //
 // This is a part of the TAPI Applications Classes .NET library (ATAPI)
 //
-// Copyright (c) 2005-2010 JulMar Technology, Inc.
+// Copyright (c) 2005-2013 JulMar Technology, Inc.
 // Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
 // documentation files (the "Software"), to deal in the Software without restriction, including without limitation 
 // the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and 
@@ -17,6 +17,7 @@
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -248,8 +249,6 @@ namespace JulMar.Atapi
         readonly byte[] _rawBuffer;
         readonly string[] _devClasses;
         readonly List<ButtonLampInformation> _buttonArray = new List<ButtonLampInformation>();
-        readonly int[] _downloadBufferSizes;
-        readonly int[] _uploadBufferSizes;
 
         /// <summary>
         /// Constructor
@@ -318,19 +317,19 @@ namespace JulMar.Atapi
             }
 
             // Get the download buffer sizes
-            _downloadBufferSizes = new int[_pdc.dwNumSetData];
+            int[] downloadBufferSizes = new int[_pdc.dwNumSetData];
             if (_pdc.dwNumSetData > 0)
             {
                 for (int i = 0; i < _pdc.dwNumSetData; i++)
-                    _downloadBufferSizes[i] = BitConverter.ToInt32(_rawBuffer, _pdc.dwSetDataOffset + (i * 4)); 
+                    downloadBufferSizes[i] = BitConverter.ToInt32(_rawBuffer, _pdc.dwSetDataOffset + (i * 4)); 
             }
 
             // Get the upload buffer sizes
-            _uploadBufferSizes = new int[_pdc.dwNumGetData];
+            int[] uploadBufferSizes = new int[_pdc.dwNumGetData];
             if (_pdc.dwNumGetData > 0)
             {
                 for (int i = 0; i < _pdc.dwNumGetData; i++)
-                    _uploadBufferSizes[i] = BitConverter.ToInt32(_rawBuffer, _pdc.dwGetDataOffset + (i * 4));
+                    uploadBufferSizes[i] = BitConverter.ToInt32(_rawBuffer, _pdc.dwGetDataOffset + (i * 4));
             }
         }
 
@@ -1442,7 +1441,7 @@ namespace JulMar.Atapi
 		{
             _mgr = mgr;
 			_deviceId = deviceId;
-            _pcb = new TapiEventCallback(PhoneCallback);
+            _pcb = PhoneCallback;
 
             PHONEEXTENSIONID extId;
             int rc = NativeMethods.phoneNegotiateAPIVersion(_mgr.PhoneHandle, _deviceId, 
@@ -1659,11 +1658,7 @@ namespace JulMar.Atapi
                 if (buffer != null && buffer.Length > 0)
                 {
                     int deviceId = BitConverter.ToInt32(buffer, 0);
-                    foreach (TapiLine line in _mgr.Lines)
-                    {
-                        if (line.Id == deviceId)
-                            return line;
-                    }
+                    return _mgr.Lines.FirstOrDefault(line => line.Id == deviceId);
                 }
             }
             return null;
@@ -1923,7 +1918,7 @@ namespace JulMar.Atapi
 
             if (!IsOpen)
             {
-                _status = new PhoneStatus(this, ps, rawBuffer);
+                _status = new PhoneStatus(this, ps, null);
                 return;
             }
 

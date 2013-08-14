@@ -2,7 +2,7 @@
 //
 // This is a part of the TAPI Applications Classes .NET library (ATAPI)
 //
-// Copyright (c) 2005-2010 JulMar Technology, Inc.
+// Copyright (c) 2005-2013 JulMar Technology, Inc.
 // Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
 // documentation files (the "Software"), to deal in the Software without restriction, including without limitation 
 // the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and 
@@ -16,6 +16,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using JulMar.Atapi.Interop;
 using System.Runtime.InteropServices;
 
@@ -87,12 +88,7 @@ namespace JulMar.Atapi
         /// <returns>Country object</returns>
         public Country GetCountryByCode(int countryCode)
         {
-            foreach (Country c in _countries)
-            {
-                if (c.CountryCode == countryCode)
-                    return c;
-            }
-            return null;
+            return _countries.FirstOrDefault(c => c.CountryCode == countryCode);
         }
 
         private void SetLocationInfo(CallingLocation loc)
@@ -218,15 +214,7 @@ namespace JulMar.Atapi
             Marshal.FreeHGlobal(pLce);
 
             // Locate the country
-            Country locCountry = null;
-            foreach (Country country in _countries)
-            {
-                if (country.Id == lce.dwCountryID)
-                {
-                    locCountry = country;
-                    break;
-                }
-            }
+            Country locCountry = _countries.FirstOrDefault(country => country.Id == lce.dwCountryID);
 
             // Locate the default calling card (if any)
             CallingCard card = null;

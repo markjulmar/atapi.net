@@ -2,7 +2,7 @@
 //
 // This is a part of the TAPI Applications Classes .NET library (ATAPI)
 //
-// Copyright (c) 2005-2010 JulMar Technology, Inc.
+// Copyright (c) 2005-2013 JulMar Technology, Inc.
 // Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
 // documentation files (the "Software"), to deal in the Software without restriction, including without limitation 
 // the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and 
@@ -27,7 +27,7 @@ namespace JulMar.Atapi
     [Serializable]
     public class TapiException : Exception
     {
-        private readonly int _err;
+        private readonly long _err;
 
         /// <summary>
         /// Default Constructor
@@ -61,7 +61,7 @@ namespace JulMar.Atapi
         /// </summary>
         /// <param name="msg">Message</param>
         /// <param name="rc">Tapi RC</param>
-        public TapiException(string msg, int rc)
+        public TapiException(string msg, long rc)
             : this(msg, rc, null)
         {
         }
@@ -72,7 +72,7 @@ namespace JulMar.Atapi
         /// <param name="msg">Message</param>
         /// <param name="rc">Tapi RC</param>
         /// <param name="innerException">Inner Exception passed to base class</param>
-        public TapiException(string msg, int rc, Exception innerException)
+        public TapiException(string msg, long rc, Exception innerException)
             : base(string.Format(CultureInfo.CurrentCulture, "{0} [0x{1:X}] {2}", msg, rc, LookupErrorMessage(rc)), innerException)
         {
             _err = rc;
@@ -91,7 +91,7 @@ namespace JulMar.Atapi
         /// <summary>
         /// The TAPI error code reported by the TAPI api.
         /// </summary>
-        public int Error
+        public long Error
         {
             get { return _err; }
         }
@@ -99,7 +99,7 @@ namespace JulMar.Atapi
         [DllImport("kernel32.dll", SetLastError=true)]
         static extern uint FormatMessage(uint dwFlags, IntPtr lpSource,
            uint dwMessageId, uint dwLanguageId, out IntPtr lpBuffer,
-           uint nSize, IntPtr Arguments);
+           uint nSize, IntPtr arguments);
         
         [DllImport("kernel32.dll", SetLastError=true)]
         static extern IntPtr LoadLibraryEx(string lpModuleName, IntPtr handle, uint dwFlags);
@@ -134,7 +134,7 @@ namespace JulMar.Atapi
             return rc;
         }
 
-        static string LookupErrorMessage(int rc)
+        static string LookupErrorMessage(long rc)
         {
             uint errorCode = RemapErrorCode((uint)rc);
 

@@ -2,7 +2,7 @@
 //
 // This is a part of the TAPI Applications Classes .NET library (ATAPI)
 //
-// Copyright (c) 2005-2010 JulMar Technology, Inc.
+// Copyright (c) 2005-2013 JulMar Technology, Inc.
 // Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
 // documentation files (the "Software"), to deal in the Software without restriction, including without limitation 
 // the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and 
@@ -15,6 +15,7 @@
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using System;
+using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Runtime.InteropServices;
@@ -489,10 +490,10 @@ namespace JulMar.Atapi
     /// This class represents a single Tapi Address object.
     /// </summary>
     public sealed class TapiAddress
-	{
-		private readonly int _addressId;
-		private readonly TapiLine _lineOwner;
-		private string _name;
+    {
+        private readonly int _addressId;
+        private readonly TapiLine _lineOwner;
+        private string _name;
         private AddressCapabilities _addrCaps;
         private AddressStatus _addrStatus;
         private readonly List<TapiCall> _calls = new List<TapiCall>();
@@ -514,16 +515,16 @@ namespace JulMar.Atapi
         /// This event is raised when the status of the address changes.
         /// </summary>
         public event EventHandler<AddressInfoChangeEventArgs> Changed;
-		
-		internal TapiAddress(TapiLine line, int addressId)
-		{
-			_lineOwner = line;
-			_addressId = addressId;
+        
+        internal TapiAddress(TapiLine line, int addressId)
+        {
+            _lineOwner = line;
+            _addressId = addressId;
             _lineOwner.NewCall += HandleNewCall;
 
             GatherAddressCaps();
             GatherAddressStatus();
-		}
+        }
 
         /// <summary>
         /// The <see>TapiLine</see> associated with the address.
@@ -536,19 +537,19 @@ namespace JulMar.Atapi
         /// <summary>
         /// The numeric address ID
         /// </summary>
-		public int Id
-		{ 
+        public int Id
+        { 
             get 
             {
                 return _addressId;
             }
         }
-		
+        
         /// <summary>
         /// The Dialable number for the address. This will never be blank.
         /// </summary>
-		public string Address
-		{ 
+        public string Address
+        { 
             get 
             {
                 if (_name == null)
@@ -619,11 +620,7 @@ namespace JulMar.Atapi
             var calls = new List<TapiCall>();
             lock (_calls)
             {
-                foreach (TapiCall call in _calls)
-                {
-                    if ((call.CallState & requestedCallstates) != 0)
-                        calls.Add(call);
-                }
+                calls.AddRange(_calls.Where(call => (call.CallState & requestedCallstates) != 0));
             }
             return calls.ToArray();
         }
@@ -1098,7 +1095,7 @@ namespace JulMar.Atapi
                     for (int i = 0; i < lcl.dwCallsNumEntries; i++)
                     {
                         // Assume calls are 4 bytes in size.
-                        uint hCall = (uint) BitConverter.ToInt32(rawBuffer, lcl.dwCallsOffset + (i * 4));
+                        var hCall = (uint) BitConverter.ToInt32(rawBuffer, lcl.dwCallsOffset + (i * 4));
                         AddCall(new TapiCall(this, hCall));
                     }
                 }
@@ -1181,5 +1178,5 @@ namespace JulMar.Atapi
             if (NewCall != null)
                 NewCall(this, e);
         }
-	}
+    }
 }

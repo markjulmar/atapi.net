@@ -2,7 +2,7 @@
 //
 // This is a part of the TAPI Applications Classes .NET library (ATAPI)
 //
-// Copyright (c) 2005-2010 JulMar Technology, Inc.
+// Copyright (c) 2005-2013 JulMar Technology, Inc.
 // Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
 // documentation files (the "Software"), to deal in the Software without restriction, including without limitation 
 // the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and 
@@ -1866,6 +1866,7 @@ namespace JulMar.Atapi
     /// values listed above should be straightforward.
     /// </summary>
     /// <remarks>Note that vendors can add their own extensions and the value may not be present here.</remarks>
+    [Flags]
     public enum LampMode
     {
         /// <summary>

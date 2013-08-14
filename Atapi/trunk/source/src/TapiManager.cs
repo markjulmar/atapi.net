@@ -2,7 +2,7 @@
 //
 // This is a part of the TAPI Applications Classes .NET library (ATAPI)
 //
-// Copyright (c) 2005-2010 JulMar Technology, Inc.
+// Copyright (c) 2005-2013 JulMar Technology, Inc.
 // Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
 // documentation files (the "Software"), to deal in the Software without restriction, including without limitation 
 // the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and 
@@ -15,6 +15,7 @@
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 using System;
+using System.Linq;
 using System.Runtime.InteropServices;
 using Microsoft.Win32.SafeHandles;
 using System.Collections.Generic;
@@ -218,10 +219,7 @@ namespace JulMar.Atapi
         /// </summary>
         public TapiLine[] Lines
         {
-            get
-            {
-                return _lineArray.ToArray();
-            }
+            get { return _lineArray.ToArray(); }
         }
 
         /// <summary>
@@ -229,10 +227,7 @@ namespace JulMar.Atapi
         /// </summary>
         public TapiPhone[] Phones
         {
-            get
-            {
-                return _phoneArray.ToArray();
-            }
+            get { return _phoneArray.ToArray(); }
         }
 
         /// <summary>
@@ -240,10 +235,7 @@ namespace JulMar.Atapi
         /// </summary>
         public TapiProvider[] Providers
         {
-            get
-            {
-                return _providers == null ? new TapiProvider[0] : _providers.ToArray();
-            }
+            get { return _providers == null ? new TapiProvider[0] : _providers.ToArray(); }
         }
 
         /// <summary>
@@ -373,15 +365,8 @@ namespace JulMar.Atapi
         {
             lock (_lineArray)
             {
-                foreach (TapiLine line in _lineArray)
-                {
-                    if (line.PermanentId == permanentLineId)
-                        return line;
-                }
+                return _lineArray.FirstOrDefault(line => line.PermanentId == permanentLineId);
             }
-
-            // Not found
-            return null;
         }
 
         /// <summary>
@@ -396,11 +381,7 @@ namespace JulMar.Atapi
             {
                 lock (_lineArray)
                 {
-                    foreach (TapiLine line in _lineArray)
-                    {
-                        if (string.Compare(line.Name, name, ignoreCase, CultureInfo.InvariantCulture) == 0)
-                            return line;
-                    }
+                    return _lineArray.FirstOrDefault(line => string.Compare(line.Name, name, ignoreCase, CultureInfo.InvariantCulture) == 0);
                 }
             }
 
@@ -417,17 +398,13 @@ namespace JulMar.Atapi
         {
             lock (_phoneArray)
             {
-                foreach (TapiPhone phone in _phoneArray)
-                {
-                    if (phone.PermanentId == permanentLineId)
-                        return phone;
-                }
+                return _phoneArray.FirstOrDefault(phone => phone.PermanentId == permanentLineId);
             }
-
-            // Not found
-            return null;
         }
 
+        /// <summary>
+        /// Processes the TAPI messages
+        /// </summary>
 		private void ProcessTapiMessages()
 		{
             var arrWait = new WaitHandle[] { _evtStop, _evtReceivedLineEvent, _evtReceivedPhoneEvent };
@@ -469,8 +446,7 @@ namespace JulMar.Atapi
                     // made a blocking call and is waiting on the result from this
                     // thread.. if the WinForms/WPF app then attempts to marshal to 
                     // the UI thread from this callback it will deadlock.
-                    ptmCb.BeginInvoke(msg,
-                        delegate(IAsyncResult ar)
+                    ptmCb.BeginInvoke(msg, ar =>
                         {
                             try
                             {
@@ -478,9 +454,8 @@ namespace JulMar.Atapi
                             }
                             catch (Exception ex)
                             {
-                                Debug.WriteLine("TAPI message exception: " + ex.Message);
+                                Trace.WriteLine("TAPI message exception: " + ex.Message);
                             }
-
                         }, null);
                 }
             }
@@ -598,7 +573,7 @@ namespace JulMar.Atapi
                 case TapiEvent.PHONE_DEVSPECIFIC:
 
                 case TapiEvent.PHONE_REPLY:
-                    HandleCompletion(msg.dwParam1.ToInt32(), msg.dwParam2.ToInt32());
+                    HandleCompletion(msg.dwParam1.ToInt32(), msg.dwParam2);
                     break;
                 
                 case TapiEvent.PHONE_STATE:
@@ -640,11 +615,8 @@ namespace JulMar.Atapi
                     {
                         try
                         {
-                            var del = (TapiEventCallback)Marshal.GetDelegateForFunctionPointer(msg.dwCallbackInstance, typeof(TapiEventCallback));
-                            if (del != null)
-                            {
-                                del(msg.dwMessageID, msg.dwParam1, msg.dwParam2, msg.dwParam3);
-                            }
+                            var callback = (TapiEventCallback)Marshal.GetDelegateForFunctionPointer(msg.dwCallbackInstance, typeof(TapiEventCallback));
+                            callback.Invoke(msg.dwMessageID, msg.dwParam1, msg.dwParam2, msg.dwParam3);
                         }
                         catch (Exception ex)
                         {
@@ -683,7 +655,7 @@ namespace JulMar.Atapi
                     break;
 
                 case TapiEvent.LINE_REPLY:
-                    HandleCompletion(msg.dwParam1.ToInt32(), msg.dwParam2.ToInt32());
+                    HandleCompletion(msg.dwParam1.ToInt32(), msg.dwParam2);
                     break;
 
                 
@@ -692,10 +664,10 @@ namespace JulMar.Atapi
             }
         }
 
-        internal void HandleCompletion(int reqId, int finalResult)
+        internal void HandleCompletion(int reqId, IntPtr finalResult)
         {
             DateTime timeEntered = DateTime.Now;
-            for (; ; )
+            for (; ;)
             {
                 // Wait up to 5 seconds for a completion event to show up.
                 if ((DateTime.Now - timeEntered).TotalSeconds > 5)
@@ -708,14 +680,14 @@ namespace JulMar.Atapi
                         if (req.AsyncRequestId == reqId)
                         {
                             _requests.Remove(req);
-                            req.CompleteRequest(finalResult);
+                            req.CompleteRequest(finalResult.ToInt64());
                             return;
                         }
                     }
                 }
 
                 // Not found -- must be recent and being added; wait for it.
-                Thread.Sleep(0);
+                Thread.Sleep(1);
             }
         }
 

@@ -34,7 +34,8 @@ namespace JulMar.Atapi
 	/// </summary>
 	public sealed class TapiManager : IDisposable
     {
-        private readonly string _appName;
+	    private const int RequestTimeoutSeconds = 5;
+	    private readonly string _appName;
         private HTLINEAPP _hTapiLine = new HTLINEAPP();
         private HTPHONEAPP _hTapiPhone = new HTPHONEAPP();
         private int _lineVersion;
@@ -48,6 +49,7 @@ namespace JulMar.Atapi
         private readonly Thread _workerThread;
         private List<PendingTapiRequest> _requests = new List<PendingTapiRequest>();
         private readonly List<TapiProvider> _providers = new List<TapiProvider>();
+        private readonly List<Tuple<DateTime, LINEMESSAGE>> _pendingCallStateMessages = new List<Tuple<DateTime, LINEMESSAGE>>();
         private LocationInformation _locInfo;
 
         /// <summary>
@@ -291,6 +293,7 @@ namespace JulMar.Atapi
             _lineArray = new List<TapiLine>();
             _phoneArray = new List<TapiPhone>();
 
+            _pendingCallStateMessages.Clear();
             foreach (PendingTapiRequest req in _requests)
                 req.CompleteRequest(NativeMethods.LINEERR_OPERATIONFAILED);
             _requests = new List<PendingTapiRequest>();
@@ -471,7 +474,21 @@ namespace JulMar.Atapi
                     {
                         TapiCall call = TapiCall.FindCallByHandle(msg.hDevice);
                         if (call != null)
-                            call.OnCallStateChange(msg.dwParam1.ToInt32(), msg.dwParam2, (MediaModes)msg.dwParam3.ToInt32());
+                            call.OnCallStateChange(msg.dwParam1.ToInt32(), msg.dwParam2, (MediaModes) msg.dwParam3.ToInt32());
+                        else
+                        {
+                            // Call doesn't exist (yet), wait for a LINE_REPLY to add the call.
+                            lock (_requests)
+                            {
+                                if (_requests.Any())
+                                {
+                                    lock (_pendingCallStateMessages)
+                                    {
+                                        _pendingCallStateMessages.Add(Tuple.Create(DateTime.Now,msg));
+                                    }
+                                }
+                            }
+                        }
                     }
                     break;
                 case TapiEvent.LINE_CALLINFO:
@@ -670,7 +687,7 @@ namespace JulMar.Atapi
             for (; ;)
             {
                 // Wait up to 5 seconds for a completion event to show up.
-                if ((DateTime.Now - timeEntered).TotalSeconds > 5)
+                if ((DateTime.Now - timeEntered).TotalSeconds > RequestTimeoutSeconds)
                     break;
 
                 lock (_requests)
@@ -749,5 +766,40 @@ namespace JulMar.Atapi
             }
             return id;
         }
+
+        /// <summary>
+        /// This is used to report LINE_CALLSTATE changes which got queued up due
+        /// to an async request creating calls.
+        /// </summary>
+	    internal void ReportQueuedCallStateChanges()
+	    {
+            lock (_pendingCallStateMessages)
+            {
+                for (int i = 0; i < _pendingCallStateMessages.Count; i++)
+                {
+                    bool remove = false;
+                    var entry = _pendingCallStateMessages[i];
+                    var msg = entry.Item2;
+                    TapiCall call = TapiCall.FindCallByHandle(msg.hDevice);
+                    if (call != null)
+                    {
+                        call.OnCallStateChange(msg.dwParam1.ToInt32(), msg.dwParam2, (MediaModes) msg.dwParam3.ToInt32());
+                        remove = true;
+                    }
+                    // Not found - has it been queued up too long?
+                    else if ((DateTime.Now - entry.Item1).TotalSeconds > RequestTimeoutSeconds)
+                    {
+                        remove = true;
+                    }
+
+                    // Remove this item if it was processed, or timed out.
+                    if (remove)
+                    {
+                        _pendingCallStateMessages.RemoveAt(i);
+                        i--;
+                    }
+                }
+            }
+	    }
     }
 }

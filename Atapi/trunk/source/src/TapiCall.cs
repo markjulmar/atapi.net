@@ -394,6 +394,10 @@ namespace JulMar.Atapi
             GatherCallStatus();
 
             System.Diagnostics.Debug.Assert(addrOwner.Id == _lci.dwAddressID);
+
+            // Look in the pending call state change list and see if we already have some call state
+            // change messages for this call.
+            TapiManager.ReportQueuedCallStateChanges();
 		}
 
         internal HTCALL Handle

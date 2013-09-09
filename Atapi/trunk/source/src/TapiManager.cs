@@ -478,15 +478,9 @@ namespace JulMar.Atapi
                         else
                         {
                             // Call doesn't exist (yet), wait for a LINE_REPLY to add the call.
-                            lock (_requests)
+                            lock (_pendingCallStateMessages)
                             {
-                                if (_requests.Any())
-                                {
-                                    lock (_pendingCallStateMessages)
-                                    {
-                                        _pendingCallStateMessages.Add(Tuple.Create(DateTime.Now,msg));
-                                    }
-                                }
+                                _pendingCallStateMessages.Add(Tuple.Create(DateTime.Now,msg));
                             }
                         }
                     }

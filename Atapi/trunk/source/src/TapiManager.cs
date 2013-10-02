@@ -622,7 +622,7 @@ namespace JulMar.Atapi
                 case TapiEvent.LINE_ADDRESSSTATE:
                 case TapiEvent.LINE_CLOSE:
                 case TapiEvent.LINE_APPNEWCALL:
-                    if (msg.dwCallbackInstance.ToInt32() != 0)
+                    if (msg.dwCallbackInstance != IntPtr.Zero)
                     {
                         try
                         {

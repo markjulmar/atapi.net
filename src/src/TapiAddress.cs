@@ -489,7 +489,7 @@ namespace JulMar.Atapi
     /// <summary>
     /// This class represents a single Tapi Address object.
     /// </summary>
-    public sealed class TapiAddress
+    public sealed class TapiAddress : ITapiAddress
     {
         private readonly int _addressId;
         private readonly TapiLine _lineOwner;
@@ -581,7 +581,7 @@ namespace JulMar.Atapi
         /// <summary>
         /// Returns the list of active calls on the address.
         /// </summary>
-        public TapiCall[] Calls
+        public ITapiCall[] Calls
         {
             get
             {
@@ -627,13 +627,13 @@ namespace JulMar.Atapi
 
         internal void ClearCalls()
         {
-            TapiCall[] calls = Calls;
+            ITapiCall[] calls = Calls;
             lock (_calls)
             {
                 _calls.Clear();
             }
-            foreach (TapiCall call in calls)
-                call.ForceClose();
+            foreach (ITapiCall call in calls)
+                ((TapiCall)call).ForceClose();
         }
 
         #region lineDevSpecific

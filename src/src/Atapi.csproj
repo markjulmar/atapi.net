@@ -135,6 +135,9 @@
     <Compile Include="CallTreatment.cs" />
     <Compile Include="Country.cs" />
     <Compile Include="ForwardInfo.cs" />
+    <Compile Include="Interfaces\ICallFeatureSet.cs" />
+    <Compile Include="Interfaces\ITapiCall.cs" />
+    <Compile Include="Interfaces\ITapiAddress.cs" />
     <Compile Include="TapiPhone.cs" />
     <Compile Include="Tones.cs" />
     <Compile Include="Exception.cs" />

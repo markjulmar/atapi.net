@@ -1026,7 +1026,7 @@ namespace JulMar.Atapi
         /// </summary>
         /// <param name="callId">Callid</param>
         /// <returns>TapiCall object</returns>
-        public TapiCall GetCallById(int callId)
+        public ITapiCall GetCallById(int callId)
         {
             return _addresses.SelectMany(addr => addr.Calls).FirstOrDefault(call => call.Id == callId);
         }
@@ -1035,9 +1035,9 @@ namespace JulMar.Atapi
         /// Returns all the calls on this line device.
         /// </summary>
         /// <returns>Array of calls</returns>
-        public TapiCall[] GetCalls()
+        public ITapiCall[] GetCalls()
         {
-            var calls = new List<TapiCall>();
+            var calls = new List<ITapiCall>();
             foreach (TapiAddress addr in _addresses)
             {
                 calls.AddRange(addr.Calls.Where(call => !calls.Contains(call)));
@@ -1187,7 +1187,7 @@ namespace JulMar.Atapi
             // Close all the calls on the line -- not we don't drop them.
             foreach (TapiAddress addr in _addresses)
             {
-                TapiCall[] calls = addr.Calls;
+                TapiCall[] calls = (TapiCall[])addr.Calls;
                 foreach (TapiCall call in calls)
                 {
                     try
@@ -1379,7 +1379,7 @@ namespace JulMar.Atapi
                     if (hCall != 0)
                     {
                         var call = new TapiCall(this, hCall);
-                        TapiAddress addrOwner = call.Address;
+                        TapiAddress addrOwner = (TapiAddress)call.Address;
                         addrOwner.AddCall(call);
                         return call;
                     }

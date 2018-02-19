@@ -350,6 +350,7 @@ namespace JulMar.Atapi
 		#endregion
 
 		private readonly TapiAddress _addrOwner;
+        private readonly TapiLine _lineOwner;
 		private CallState _callState = CallState.Unknown;
 		private DateTime _csTime;
 		private Privilege _csPrivilege = Privilege.None;
@@ -378,14 +379,15 @@ namespace JulMar.Atapi
 
 			int addrId = _lci.dwAddressID;
 			_addrOwner = lineOwner.Addresses[addrId];
-			Guid = Guid.NewGuid();
+            _lineOwner = (TapiLine)_addrOwner.Line;
+            Guid = Guid.NewGuid();
 		}
 
 		internal TapiCall(TapiAddress addrOwner, uint hCall)
 		{
 			_hCall = new HTCALL(hCall, true);
 			_addrOwner = addrOwner;
-
+            _lineOwner = (TapiLine)_addrOwner.Line;
 			lock (CallsMap)
 			{
 				CallsMap.Add(hCall, this);
@@ -420,7 +422,7 @@ namespace JulMar.Atapi
 
 		private TapiManager TapiManager
 		{
-			get { return Line.TapiManager; }
+			get { return _lineOwner.TapiManager; }
 		}
 
 		internal static TapiCall FindCallByHandle(uint htCall)
@@ -453,7 +455,7 @@ namespace JulMar.Atapi
 		/// <summary>
 		/// Returns the <see cref="TapiLine"/> associated with the call.
 		/// </summary>
-		public TapiLine Line
+		public ITapiLine Line
 		{
 			get { return _addrOwner.Line; }
 		}
@@ -632,7 +634,7 @@ namespace JulMar.Atapi
 				GetLastLineCallInfo(out lci, out lciData);
 
 				return ((lci.dwCallerIDFlags & NativeMethods.LINECALLPARTYID_ADDRESS) > 0) ?
-					NativeMethods.GetString(lciData, lci.dwCallerIDOffset, lci.dwCallerIDSize, Line.StringFormat) : string.Empty;
+					NativeMethods.GetString(lciData, lci.dwCallerIDOffset, lci.dwCallerIDSize, _lineOwner.StringFormat) : string.Empty;
 			}
 		}
 
@@ -648,7 +650,7 @@ namespace JulMar.Atapi
 				GetLastLineCallInfo(out lci, out lciData);
 
 				return ((lci.dwCallerIDFlags & NativeMethods.LINECALLPARTYID_NAME) > 0) ?
-					NativeMethods.GetString(lciData, lci.dwCallerIDNameOffset, lci.dwCallerIDNameSize, Line.StringFormat) : string.Empty;
+					NativeMethods.GetString(lciData, lci.dwCallerIDNameOffset, lci.dwCallerIDNameSize, _lineOwner.StringFormat) : string.Empty;
 			}
 		}
 
@@ -664,7 +666,7 @@ namespace JulMar.Atapi
 				GetLastLineCallInfo(out lci, out lciData);
 
 				return ((lci.dwCalledIDFlags & NativeMethods.LINECALLPARTYID_ADDRESS) > 0) ?
-					NativeMethods.GetString(lciData, lci.dwCalledIDOffset, lci.dwCalledIDSize, Line.StringFormat) : string.Empty;
+					NativeMethods.GetString(lciData, lci.dwCalledIDOffset, lci.dwCalledIDSize, _lineOwner.StringFormat) : string.Empty;
 			}
 		}
 
@@ -680,7 +682,7 @@ namespace JulMar.Atapi
 				GetLastLineCallInfo(out lci, out lciData);
 
 				return ((lci.dwCalledIDFlags & NativeMethods.LINECALLPARTYID_NAME) > 0) ?
-					NativeMethods.GetString(lciData, lci.dwCalledIDNameOffset, lci.dwCalledIDNameSize, Line.StringFormat) : string.Empty;
+					NativeMethods.GetString(lciData, lci.dwCalledIDNameOffset, lci.dwCalledIDNameSize, _lineOwner.StringFormat) : string.Empty;
 			}
 		}
 
@@ -696,7 +698,7 @@ namespace JulMar.Atapi
 				GetLastLineCallInfo(out lci, out lciData);
 
 				return ((lci.dwConnectedIDFlags & NativeMethods.LINECALLPARTYID_ADDRESS) > 0) ?
-					NativeMethods.GetString(lciData, lci.dwConnectedIDOffset, lci.dwConnectedIDSize, Line.StringFormat) : string.Empty;
+					NativeMethods.GetString(lciData, lci.dwConnectedIDOffset, lci.dwConnectedIDSize, _lineOwner.StringFormat) : string.Empty;
 			}
 		}
 
@@ -712,7 +714,7 @@ namespace JulMar.Atapi
 				GetLastLineCallInfo(out lci, out lciData);
 
 				return ((lci.dwConnectedIDFlags & NativeMethods.LINECALLPARTYID_NAME) > 0) ?
-					NativeMethods.GetString(lciData, lci.dwConnectedIDNameOffset, lci.dwConnectedIDNameSize, Line.StringFormat) : string.Empty;
+					NativeMethods.GetString(lciData, lci.dwConnectedIDNameOffset, lci.dwConnectedIDNameSize, _lineOwner.StringFormat) : string.Empty;
 			}
 		}
 
@@ -728,7 +730,7 @@ namespace JulMar.Atapi
 				GetLastLineCallInfo(out lci, out lciData);
 
 				return ((lci.dwRedirectingIDFlags & NativeMethods.LINECALLPARTYID_ADDRESS) > 0) ?
-					NativeMethods.GetString(lciData, lci.dwRedirectingIDOffset, lci.dwRedirectingIDSize, Line.StringFormat) : string.Empty;
+					NativeMethods.GetString(lciData, lci.dwRedirectingIDOffset, lci.dwRedirectingIDSize, _lineOwner.StringFormat) : string.Empty;
 			}
 		}
 
@@ -744,7 +746,7 @@ namespace JulMar.Atapi
 				GetLastLineCallInfo(out lci, out lciData);
 
 				return ((lci.dwRedirectingIDFlags & NativeMethods.LINECALLPARTYID_NAME) > 0) ?
-					NativeMethods.GetString(lciData, lci.dwRedirectingIDNameOffset, lci.dwRedirectingIDNameSize, Line.StringFormat) : string.Empty;
+					NativeMethods.GetString(lciData, lci.dwRedirectingIDNameOffset, lci.dwRedirectingIDNameSize, _lineOwner.StringFormat) : string.Empty;
 			}
 		}
 
@@ -760,7 +762,7 @@ namespace JulMar.Atapi
 				GetLastLineCallInfo(out lci, out lciData);
 
 				return ((lci.dwRedirectionIDFlags & NativeMethods.LINECALLPARTYID_ADDRESS) > 0) ?
-					NativeMethods.GetString(lciData, lci.dwRedirectionIDOffset, lci.dwRedirectionIDSize, Line.StringFormat) : string.Empty;
+					NativeMethods.GetString(lciData, lci.dwRedirectionIDOffset, lci.dwRedirectionIDSize, _lineOwner.StringFormat) : string.Empty;
 			}
 		}
 
@@ -776,7 +778,7 @@ namespace JulMar.Atapi
 				GetLastLineCallInfo(out lci, out lciData);
 
 				return ((lci.dwRedirectionIDFlags & NativeMethods.LINECALLPARTYID_NAME) > 0) ?
-					NativeMethods.GetString(lciData, lci.dwRedirectionIDNameOffset, lci.dwRedirectionIDNameSize, Line.StringFormat) : string.Empty;
+					NativeMethods.GetString(lciData, lci.dwRedirectionIDNameOffset, lci.dwRedirectionIDNameSize, _lineOwner.StringFormat) : string.Empty;
 			}
 		}
 
@@ -1268,14 +1270,14 @@ namespace JulMar.Atapi
 			IntPtr ip = Marshal.AllocHGlobal(inData.Length);
 			Marshal.Copy(inData, 0, ip, inData.Length);
 
-			int rc = NativeMethods.lineDevSpecific(Line.Handle, Address.Id, (uint)Handle.DangerousGetHandle().ToInt32(), ip, inData.Length);
+			int rc = NativeMethods.lineDevSpecific(_lineOwner.Handle, Address.Id, (uint)Handle.DangerousGetHandle().ToInt32(), ip, inData.Length);
 			if (rc < 0)
 			{
 				Marshal.FreeHGlobal(ip);
 				throw new TapiException("lineDevSpecific failed", rc);
 			}
 
-			return Line.TapiManager.AddAsyncRequest(new PendingTapiRequest(rc, acb, state, ip, inData.Length));
+			return _lineOwner.TapiManager.AddAsyncRequest(new PendingTapiRequest(rc, acb, state, ip, inData.Length));
 		}
 
 		/// <summary>
@@ -1683,7 +1685,7 @@ namespace JulMar.Atapi
 					for (int i = 0; i < lcl.dwCallsNumEntries; i++)
 					{
 						uint hCall = (uint) BitConverter.ToInt32(rawBuffer, lcl.dwCallsOffset + (i * 4));
-						TapiCall call = FindCallByHandle(hCall) ?? new TapiCall(Line, hCall);
+						TapiCall call = FindCallByHandle(hCall) ?? new TapiCall(_lineOwner, hCall);
 						callList.Add(call);
 					}
 				}
@@ -1706,7 +1708,7 @@ namespace JulMar.Atapi
 		/// <returns>string or byte[]</returns>
 		public object GetExternalDeviceInfo(string deviceClass)
 		{
-			if (Line.Handle.IsInvalid)
+			if (_lineOwner.Handle.IsInvalid)
 				throw new InvalidOperationException("Line is not open");
 			if (Handle.IsInvalid)
 				throw new InvalidOperationException("Call is not active");
@@ -1719,7 +1721,7 @@ namespace JulMar.Atapi
 				vs.dwTotalSize = neededSize;
 				IntPtr lpVs = Marshal.AllocHGlobal(neededSize);
 				Marshal.StructureToPtr(vs, lpVs, true);
-				rc = NativeMethods.lineGetID(Line.Handle, Address.Id, Handle, NativeMethods.LINECALLSELECT_CALL, lpVs, deviceClass);
+				rc = NativeMethods.lineGetID(_lineOwner.Handle, Address.Id, Handle, NativeMethods.LINECALLSELECT_CALL, lpVs, deviceClass);
 				Marshal.PtrToStructure(lpVs, vs);
 				if (vs.dwNeededSize > neededSize)
 				{
@@ -2106,7 +2108,7 @@ namespace JulMar.Atapi
 					// Wait for the LINE_REPLY so we don't need to deal with the value type 
 					// issues of IntPtr being filled in async.
 					var req = new PendingTapiRequest(rc, null, null);
-					Line.TapiManager.AddAsyncRequest(req);
+                    _lineOwner.TapiManager.AddAsyncRequest(req);
 					req.AsyncWaitHandle.WaitOne();
 					if (req.Result < 0)
 						throw new TapiException("linePrepareAddToConference failed", req.Result);
@@ -2350,7 +2352,7 @@ namespace JulMar.Atapi
 					// Wait for the LINE_REPLY so we don't need to deal with the value type 
 					// issues of IntPtr being filled in async.
 					var req = new PendingTapiRequest(rc, null, null);
-					Line.TapiManager.AddAsyncRequest(req);
+                    _lineOwner.TapiManager.AddAsyncRequest(req);
 					req.AsyncWaitHandle.WaitOne();
 					if (req.Result < 0)
 						throw new TapiException("lineSetupConference failed", req.Result);
@@ -2403,7 +2405,7 @@ namespace JulMar.Atapi
 					// Wait for the LINE_REPLY so we don't need to deal with the value type 
 					// issues of IntPtr being filled in async.
 					var req = new PendingTapiRequest(rc, null, null);
-					Line.TapiManager.AddAsyncRequest(req);
+                    _lineOwner.TapiManager.AddAsyncRequest(req);
 					req.AsyncWaitHandle.WaitOne();
 					if (req.Result < 0)
 						throw new TapiException("lineSetupTransfer failed", req.Result);
@@ -2439,7 +2441,7 @@ namespace JulMar.Atapi
 				throw new TapiException("lineCompleteTransfer failed", rc);
 			
 			var req = new PendingTapiRequest(rc, null, null);
-			Line.TapiManager.AddAsyncRequest(req);
+            _lineOwner.TapiManager.AddAsyncRequest(req);
 			if (req.AsyncWaitHandle.WaitOne(5000, true))
 			{
 				if (req.Result < 0)
@@ -2463,7 +2465,7 @@ namespace JulMar.Atapi
 				throw new TapiException("lineCompleteTransfer failed", rc);
 			
 			var req = new PendingTapiRequest(rc, null, null);
-			Line.TapiManager.AddAsyncRequest(req);
+            _lineOwner.TapiManager.AddAsyncRequest(req);
 			if (req.AsyncWaitHandle.WaitOne(5000, true))
 			{
 				if (req.Result < 0)

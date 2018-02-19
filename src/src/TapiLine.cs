@@ -761,8 +761,8 @@ namespace JulMar.Atapi
     /// <summary>
     /// This object represents a single exposed line device from Tapi.
     /// </summary>
-    public sealed class TapiLine : IDisposable
-	{
+    public sealed class TapiLine : IDisposable, ITapiLine
+    {
         private const int MinTapiVersion = (int) TapiVersion.V13;
         private const int MaxTapiVersion = (int) TapiVersion.V31;
 
@@ -1187,7 +1187,7 @@ namespace JulMar.Atapi
             // Close all the calls on the line -- not we don't drop them.
             foreach (TapiAddress addr in _addresses)
             {
-                TapiCall[] calls = (TapiCall[])addr.Calls;
+                ITapiCall[] calls = addr.Calls;
                 foreach (TapiCall call in calls)
                 {
                     try

@@ -150,7 +150,7 @@ namespace JulMar.Atapi
 		/// <summary>
 		/// Returns the <see cref="TapiLine"/> associated with the call.
 		/// </summary>
-		TapiLine Line { get; }
+		ITapiLine Line { get; }
 
 		/// <summary>
 		/// This turns media detection on and off.  It is enabled by default, but can be turned off to avoid computational overhead when 

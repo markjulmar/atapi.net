@@ -35,7 +35,7 @@ namespace JulMar.Atapi
         /// <summary>
         /// The <see>TapiLine</see> associated with the address.
         /// </summary>
-        TapiLine Line { get; }
+        ITapiLine Line { get; }
 
         /// <summary>
         /// Returns the <see>AddressStatus</see> status structure.

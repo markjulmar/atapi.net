@@ -529,7 +529,7 @@ namespace JulMar.Atapi
         /// <summary>
         /// The <see>TapiLine</see> associated with the address.
         /// </summary>
-        public TapiLine Line
+        public ITapiLine Line
         {
             get { return _lineOwner; }
         }
@@ -600,13 +600,13 @@ namespace JulMar.Atapi
             get
             {
                 int numRings;
-                int rc = NativeMethods.lineGetNumRings(Line.Handle, _addressId, out numRings);
+                int rc = NativeMethods.lineGetNumRings(_lineOwner.Handle, _addressId, out numRings);
                 return (rc == 0) ? numRings : 0;
             }
 
             set
             {
-                NativeMethods.lineSetNumRings(Line.Handle, _addressId, value);
+                NativeMethods.lineSetNumRings(_lineOwner.Handle, _addressId, value);
             }
         }
 
@@ -663,14 +663,14 @@ namespace JulMar.Atapi
             IntPtr ip = Marshal.AllocHGlobal(inData.Length);
             Marshal.Copy(inData, 0, ip, inData.Length);
 
-            int rc = NativeMethods.lineDevSpecific(Line.Handle, _addressId, 0, ip, inData.Length);
+            int rc = NativeMethods.lineDevSpecific(_lineOwner.Handle, _addressId, 0, ip, inData.Length);
             if (rc < 0)
             {
                 Marshal.FreeHGlobal(ip);
                 throw new TapiException("lineDevSpecific failed", rc);
             }
 
-            return Line.TapiManager.AddAsyncRequest(new PendingTapiRequest(rc, acb, state, ip, inData.Length));
+            return _lineOwner.TapiManager.AddAsyncRequest(new PendingTapiRequest(rc, acb, state, ip, inData.Length));
         }
 
         /// <summary>
@@ -730,14 +730,14 @@ namespace JulMar.Atapi
             IntPtr ip = Marshal.AllocHGlobal(inData.Length);
             Marshal.Copy(inData, 0, ip, inData.Length);
 
-            int rc = NativeMethods.lineDevSpecificFeature(Line.Handle, featureCode, ip, inData.Length);
+            int rc = NativeMethods.lineDevSpecificFeature(_lineOwner.Handle, featureCode, ip, inData.Length);
             if (rc < 0)
             {
                 Marshal.FreeHGlobal(ip);
                 throw new TapiException("lineDevSpecificFeature failed", rc);
             }
 
-            return Line.TapiManager.AddAsyncRequest(new PendingTapiRequest(rc, acb, state, ip, inData.Length));
+            return _lineOwner.TapiManager.AddAsyncRequest(new PendingTapiRequest(rc, acb, state, ip, inData.Length));
         }
         #endregion
 
@@ -762,7 +762,7 @@ namespace JulMar.Atapi
                 lpCp = MakeCallParams.ProcessCallParams(_addressId, param, 0);
                 uint hCall;
 
-                int rc = NativeMethods.lineForward(Line.Handle, 0, _addressId, fwdList, numRingsNoAnswer, out hCall, lpCp);
+                int rc = NativeMethods.lineForward(_lineOwner.Handle, 0, _addressId, fwdList, numRingsNoAnswer, out hCall, lpCp);
                 if (rc < 0)
                     throw new TapiException("lineForward failed", rc);
                 else
@@ -770,7 +770,7 @@ namespace JulMar.Atapi
                     // Wait for the LINE_REPLY so we don't need to deal with the value type 
                     // issues of IntPtr being filled in async.
                     var req = new PendingTapiRequest(rc, null, null);
-                    Line.TapiManager.AddAsyncRequest(req);
+                    _lineOwner.TapiManager.AddAsyncRequest(req);
                     req.AsyncWaitHandle.WaitOne();
                     if (req.Result < 0)
                         throw new TapiException("lineForward failed", req.Result);
@@ -800,14 +800,14 @@ namespace JulMar.Atapi
         public void CancelForward()
         {
             uint hCall;
-            int rc = NativeMethods.lineForward(Line.Handle, 0, _addressId, IntPtr.Zero, 0, out hCall, IntPtr.Zero);
+            int rc = NativeMethods.lineForward(_lineOwner.Handle, 0, _addressId, IntPtr.Zero, 0, out hCall, IntPtr.Zero);
             if (rc < 0)
                 throw new TapiException("lineForward failed", rc);
             
             // Wait for the LINE_REPLY so we don't need to deal with the value type 
             // issues of IntPtr being filled in async.
             var req = new PendingTapiRequest(rc, null, null);
-            Line.TapiManager.AddAsyncRequest(req);
+            _lineOwner.TapiManager.AddAsyncRequest(req);
             if (req.AsyncWaitHandle.WaitOne(1000, true))
             {
                 if (req.Result < 0)
@@ -846,7 +846,7 @@ namespace JulMar.Atapi
             {
                 lpCp = MakeCallParams.ProcessCallParams(_addressId, param, 0);
                 uint hCall;
-                int rc = NativeMethods.lineMakeCall(Line.Handle, out hCall, address, countryCode, lpCp);
+                int rc = NativeMethods.lineMakeCall(_lineOwner.Handle, out hCall, address, countryCode, lpCp);
                 if (rc < 0)
                 {
                     throw new TapiException("lineMakeCall failed", rc);
@@ -856,7 +856,7 @@ namespace JulMar.Atapi
                     // Wait for the LINE_REPLY so we don't need to deal with the value type 
                     // issues of IntPtr being filled in async.
                     var req = new PendingTapiRequest(rc, null, null);
-                    Line.TapiManager.AddAsyncRequest(req);
+                    _lineOwner.TapiManager.AddAsyncRequest(req);
                     req.AsyncWaitHandle.WaitOne();
                     if (req.Result < 0)
                         throw new TapiException("lineMakeCall failed", req.Result);
@@ -886,13 +886,13 @@ namespace JulMar.Atapi
         public TapiCall Pickup(string alertingAddress, string groupId)
         {
             uint hCall;
-            int rc = NativeMethods.linePickup(Line.Handle, _addressId, out hCall, alertingAddress, groupId);
+            int rc = NativeMethods.linePickup(_lineOwner.Handle, _addressId, out hCall, alertingAddress, groupId);
             if (rc < 0)
                 throw new TapiException("linePickup failed", rc);
 
             // Wait for the LINE_REPLY .. same reason as lineMakeCall..
             var req = new PendingTapiRequest(rc, null, null);
-            Line.TapiManager.AddAsyncRequest(req);
+            _lineOwner.TapiManager.AddAsyncRequest(req);
             req.AsyncWaitHandle.WaitOne();
             if (req.Result < 0)
                 throw new TapiException("linePickup failed", req.Result);
@@ -924,7 +924,7 @@ namespace JulMar.Atapi
                     callFlags |= NativeMethods.LINECALLPARAMFLAGS_NOHOLDCONFERENCE;
                 lpCp = MakeCallParams.ProcessCallParams(Id, mcp, callFlags);
                 uint hCall, hConfCall;
-                int rc = NativeMethods.lineSetupConference(new HTCALL(), Line.Handle, out hConfCall, out hCall, conferenceCount, lpCp);
+                int rc = NativeMethods.lineSetupConference(new HTCALL(), _lineOwner.Handle, out hConfCall, out hCall, conferenceCount, lpCp);
                 if (rc < 0)
                 {
                     throw new TapiException("lineSetupConference failed", rc);
@@ -934,7 +934,7 @@ namespace JulMar.Atapi
                     // Wait for the LINE_REPLY so we don't need to deal with the value type 
                     // issues of IntPtr being filled in async.
                     var req = new PendingTapiRequest(rc, null, null);
-                    Line.TapiManager.AddAsyncRequest(req);
+                    _lineOwner.TapiManager.AddAsyncRequest(req);
                     req.AsyncWaitHandle.WaitOne();
                     if (req.Result < 0)
                         throw new TapiException("lineSetupConference failed", req.Result);
@@ -971,13 +971,13 @@ namespace JulMar.Atapi
         public TapiCall Unpark(string parkedAddress)
         {
             uint hCall;
-            int rc = NativeMethods.lineUnpark(Line.Handle, _addressId, out hCall, parkedAddress);
+            int rc = NativeMethods.lineUnpark(_lineOwner.Handle, _addressId, out hCall, parkedAddress);
             if (rc < 0)
                 throw new TapiException("lineUnpark failed", rc);
 
             // Wait for the LINE_REPLY .. same reason as lineMakeCall..
             var req = new PendingTapiRequest(rc, null, null);
-            Line.TapiManager.AddAsyncRequest(req);
+            _lineOwner.TapiManager.AddAsyncRequest(req);
             req.AsyncWaitHandle.WaitOne();
             if (req.Result < 0)
                 throw new TapiException("lineUnpark failed", req.Result);
@@ -1006,7 +1006,7 @@ namespace JulMar.Atapi
                 vs.dwTotalSize = neededSize;
                 IntPtr lpVs = Marshal.AllocHGlobal(neededSize);
                 Marshal.StructureToPtr(vs, lpVs, true);
-                rc = NativeMethods.lineGetID(Line.Handle, Id, null, NativeMethods.LINECALLSELECT_ADDRESS, lpVs, deviceClass);
+                rc = NativeMethods.lineGetID(_lineOwner.Handle, Id, null, NativeMethods.LINECALLSELECT_ADDRESS, lpVs, deviceClass);
                 Marshal.PtrToStructure(lpVs, vs);
                 if (vs.dwNeededSize > neededSize)
                 {
@@ -1059,7 +1059,7 @@ namespace JulMar.Atapi
                 Marshal.FreeHGlobal(pLac);
             }
             while (rc == NativeMethods.LINEERR_STRUCTURETOOSMALL);
-            _addrCaps = new AddressCapabilities(lac, rawBuffer, Line.StringFormat);
+            _addrCaps = new AddressCapabilities(lac, rawBuffer, _lineOwner.StringFormat);
         }
 
         internal void OnAddressStateChange(int changedState)
@@ -1080,7 +1080,7 @@ namespace JulMar.Atapi
                 Marshal.StructureToPtr(lcl, pLcl, true);
                 
                 // Get any existing calls on the address..
-                rc = NativeMethods.lineGetNewCalls(Line.Handle, Id, NativeMethods.LINECALLSELECT_ADDRESS, pLcl);
+                rc = NativeMethods.lineGetNewCalls(_lineOwner.Handle, Id, NativeMethods.LINECALLSELECT_ADDRESS, pLcl);
                 Marshal.PtrToStructure(pLcl, lcl);
                 
                 if (lcl.dwNeededSize > neededSize)
@@ -1131,7 +1131,7 @@ namespace JulMar.Atapi
                 las.dwTotalSize = neededSize;
                 IntPtr pLas = Marshal.AllocHGlobal(neededSize);
                 Marshal.StructureToPtr(las, pLas, true);
-                rc = NativeMethods.lineGetAddressStatus(Line.Handle, _addressId, pLas);
+                rc = NativeMethods.lineGetAddressStatus(_lineOwner.Handle, _addressId, pLas);
                 Marshal.PtrToStructure(pLas, las);
                 if (las.dwNeededSize > neededSize)
                 {
@@ -1146,7 +1146,7 @@ namespace JulMar.Atapi
                 Marshal.FreeHGlobal(pLas);
             }
             while (rc == NativeMethods.LINEERR_STRUCTURETOOSMALL);
-            _addrStatus = new AddressStatus(las, rawBuffer, Line.StringFormat);
+            _addrStatus = new AddressStatus(las, rawBuffer, _lineOwner.StringFormat);
         }
 
         /// <summary>

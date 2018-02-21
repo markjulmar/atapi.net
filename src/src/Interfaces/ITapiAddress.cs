@@ -114,7 +114,7 @@ namespace JulMar.Atapi
         /// </summary>
         /// <param name="requestedCallstates">Callstate desired</param>
         /// <returns>TapiCall array</returns>
-        TapiCall[] FindCallsByCallState(CallState requestedCallstates);
+        ITapiCall[] FindCallsByCallState(CallState requestedCallstates);
 
         /// <summary>
         /// This forwards calls destined for this address according to the specified forwarding instructions. 
@@ -124,7 +124,7 @@ namespace JulMar.Atapi
         /// <param name="forwardInstructions">The forwarding instructions to apply</param>
         /// <param name="numRingsNoAnswer">Number of rings before a call is considered a "no answer." If dwNumRingsNoAnswer is out of range, the actual value is set to the nearest value in the allowable range.</param>
         /// <param name="param">Optional call parameters - only used if a consultation call is returned; otherwise ignored.  May be null for default parameters</param>
-        TapiCall Forward(ForwardInfo[] forwardInstructions, int numRingsNoAnswer, MakeCallParams param);
+        ITapiCall Forward(ForwardInfo[] forwardInstructions, int numRingsNoAnswer, MakeCallParams param);
 
         /// <summary>
         /// This returns a device identifier for the specified device class associated with the call
@@ -138,7 +138,7 @@ namespace JulMar.Atapi
         /// </summary>
         /// <param name="address">Number to dial</param>
         /// <returns>New <see>TapiCall</see> object.</returns>
-        TapiCall MakeCall(string address);
+        ITapiCall MakeCall(string address);
 
         /// <summary>
         /// Places a new call on the address
@@ -147,7 +147,7 @@ namespace JulMar.Atapi
         /// <param name="countryCode">Country code</param>
         /// <param name="param">Optional <see>MakeCallParams</see> to use while dialing</param>
         /// <returns>New <see cref="TapiCall"/> object.</returns>
-        TapiCall MakeCall(string address, int countryCode, MakeCallParams param);
+        ITapiCall MakeCall(string address, int countryCode, MakeCallParams param);
 
         /// <summary>
         /// This picks up a call alerting at the specified destination address and returns a call handle for the picked-up call. 
@@ -157,7 +157,7 @@ namespace JulMar.Atapi
         /// <param name="alertingAddress">Address to retrieve call from</param>
         /// <param name="groupId">Optional group ID, can be null or empty</param>
         /// <returns>New <see cref="TapiCall"/> object.</returns>
-        TapiCall Pickup(string alertingAddress, string groupId);
+        ITapiCall Pickup(string alertingAddress, string groupId);
 
         /// <summary>
         /// This method is used to establish a conference call
@@ -166,13 +166,13 @@ namespace JulMar.Atapi
         /// <param name="mcp">Call parameters for created consultation call</param>
         /// <param name="consultCall">Returning consultation call</param>
         /// <returns>Conference call</returns>
-        TapiCall SetupConference(int conferenceCount, MakeCallParams mcp, out TapiCall consultCall);
+        ITapiCall SetupConference(int conferenceCount, MakeCallParams mcp, out TapiCall consultCall);
 
         /// <summary>
         /// This retrieves a call off a parked address
         /// </summary>
         /// <param name="parkedAddress">Address to retrieve call from</param>
         /// <returns>New <see cref="TapiCall"/> object.</returns>
-        TapiCall Unpark(string parkedAddress);
+        ITapiCall Unpark(string parkedAddress);
     }
 }

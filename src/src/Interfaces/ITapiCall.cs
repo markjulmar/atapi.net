@@ -859,5 +859,11 @@ namespace JulMar.Atapi
 		/// </summary>
 		void Unhold();
 
-	}
+        /// <summary>
+		/// IDisposable.Dispose implementation
+		/// </summary>
+        void Dispose();
+
+
+    }
 }

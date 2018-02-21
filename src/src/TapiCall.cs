@@ -378,7 +378,7 @@ namespace JulMar.Atapi
 			GatherCallStatus();
 
 			int addrId = _lci.dwAddressID;
-			_addrOwner = lineOwner.Addresses[addrId];
+			_addrOwner = (TapiAddress)lineOwner.Addresses[addrId];
             _lineOwner = (TapiLine)_addrOwner.Line;
             Guid = Guid.NewGuid();
 		}

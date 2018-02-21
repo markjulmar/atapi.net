@@ -162,21 +162,21 @@ namespace Phone
 
         private void _btnMakeCall_Click(object sender, EventArgs e)
         {
-            TapiCall tc = CurrentAddress.MakeCall(_tbNumber.Text);
+            ITapiCall tc = CurrentAddress.MakeCall(_tbNumber.Text);
             ActiveCallForm acf = new ActiveCallForm(tc);
             acf.Show();
         }
 
         private void _btnPickup_Click(object sender, EventArgs e)
         {
-            TapiCall tc = CurrentAddress.Pickup(_tbNumber.Text, null);
+            ITapiCall tc = CurrentAddress.Pickup(_tbNumber.Text, null);
             ActiveCallForm acf = new ActiveCallForm(tc);
             acf.Show();
         }
 
         private void _btnUnpark_Click(object sender, EventArgs e)
         {
-            TapiCall tc = CurrentAddress.Unpark(_tbNumber.Text);
+            ITapiCall tc = CurrentAddress.Unpark(_tbNumber.Text);
             ActiveCallForm acf = new ActiveCallForm(tc);
             acf.Show();
         }

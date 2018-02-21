@@ -11,10 +11,10 @@ namespace Phone
 {
     public partial class SelectCallForm : Form
     {
-        TapiLine _line;
+        ITapiLine _line;
         TapiCall _call;
 
-        public SelectCallForm(TapiLine line)
+        public SelectCallForm(ITapiLine line)
         {
             _line = line;
             InitializeComponent();

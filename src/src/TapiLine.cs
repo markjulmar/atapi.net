@@ -500,9 +500,9 @@ namespace JulMar.Atapi
         readonly LINEDEVSTATUS _lds;
         readonly byte[] _rawBuffer;
 
-        internal LineStatus(TapiLine owner, LINEDEVSTATUS lds, byte[] buffer)
+        internal LineStatus(ITapiLine owner, LINEDEVSTATUS lds, byte[] buffer)
         {
-            _lineOwner = owner;
+            _lineOwner = (TapiLine)owner;
             _lds = lds;
             _rawBuffer = buffer;
         }
@@ -1007,7 +1007,7 @@ namespace JulMar.Atapi
         /// <summary>
         /// The available addresses on this line.
         /// </summary>
-        public TapiAddress[] Addresses
+        public ITapiAddress[] Addresses
         {
             get { return (TapiAddress[]) _addresses.Clone(); }
         }
@@ -1050,7 +1050,7 @@ namespace JulMar.Atapi
         /// </summary>
         /// <param name="number">DN to locate</param>
         /// <returns>TapiAddress or null if not found.</returns>
-        public TapiAddress FindAddress(string number)
+        public ITapiAddress FindAddress(string number)
         {
             return _addresses.FirstOrDefault(addr => string.Compare(addr.Address, number, true, CultureInfo.InvariantCulture) == 0);
         }
@@ -1219,7 +1219,7 @@ namespace JulMar.Atapi
         /// </summary>
         /// <param name="address">Number to dial</param>
         /// <returns><see cref="TapiCall"/> object or null.</returns>
-        public TapiCall MakeCall(string address)
+        public ITapiCall MakeCall(string address)
         {
             return MakeCall(address, null, null);
         }
@@ -1231,7 +1231,7 @@ namespace JulMar.Atapi
         /// <param name="country"><see cref="Country"/> object (null for default).</param>
         /// <param name="param">Optional <see cref="MakeCallParams"/> to use when dialing.</param>
         /// <returns><see cref="TapiCall"/> object or null.</returns>
-        public TapiCall MakeCall(string address, Country country, MakeCallParams param)
+        public ITapiCall MakeCall(string address, Country country, MakeCallParams param)
         {
             return (from addr in Addresses 
                     where addr.Status.CanMakeCall 
@@ -1351,7 +1351,7 @@ namespace JulMar.Atapi
         /// <param name="forwardInstructions">The forwarding instructions to apply</param>
         /// <param name="numRingsNoAnswer">Number of rings before a call is considered a "no answer." If dwNumRingsNoAnswer is out of range, the actual value is set to the nearest value in the allowable range.</param>
         /// <param name="param">Optional call parameters - only used if a consultation call is returned; otherwise ignored.  May be null for default parameters</param>
-        public TapiCall Forward(ForwardInfo[] forwardInstructions, int numRingsNoAnswer, MakeCallParams param)
+        public ITapiCall Forward(ForwardInfo[] forwardInstructions, int numRingsNoAnswer, MakeCallParams param)
         {
             if (!IsOpen)
                 throw new TapiException("Line is not open", NativeMethods.LINEERR_OPERATIONUNAVAIL);

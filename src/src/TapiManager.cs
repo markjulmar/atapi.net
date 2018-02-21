@@ -46,7 +46,7 @@ namespace JulMar.Atapi
         private readonly ManualResetEvent _evtReceivedLineEvent = new ManualResetEvent(false);
         private readonly ManualResetEvent _evtReceivedPhoneEvent = new ManualResetEvent(false);
         private readonly ManualResetEvent _evtStop = new ManualResetEvent(false);
-        private readonly Thread _workerThread;
+        private Thread _workerThread;
         private List<PendingTapiRequest> _requests = new List<PendingTapiRequest>();
         private readonly List<TapiProvider> _providers = new List<TapiProvider>();
         private readonly List<Tuple<DateTime, LINEMESSAGE>> _pendingCallStateMessages = new List<Tuple<DateTime, LINEMESSAGE>>();
@@ -117,7 +117,6 @@ namespace JulMar.Atapi
             _appName = appName;
             _lineVersion = (int) ver;
             _phoneVersion = (int)ver;
-            _workerThread = new Thread(ProcessTapiMessages) {Name = "Tapi Message Processor"};
             _lineArray = new List<TapiLine>();
             _phoneArray = new List<TapiPhone>();
 		}
@@ -138,6 +137,7 @@ namespace JulMar.Atapi
 
             if (numLines > 0 || numPhones > 0)
             {
+                _workerThread = new Thread(ProcessTapiMessages) { Name = "Tapi Message Processor" };
                 _workerThread.Start();
                 ReadProviderList();
                 _locInfo = new LocationInformation(this);
@@ -284,7 +284,7 @@ namespace JulMar.Atapi
             }
 
             // Wait for the worker
-            if (!_workerThread.Join(5000))
+            if (_workerThread != null && !_workerThread.Join(5000))
             {
                 _workerThread.Interrupt();
                 _workerThread.Join();

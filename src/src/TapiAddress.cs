@@ -615,7 +615,7 @@ namespace JulMar.Atapi
         /// </summary>
         /// <param name="requestedCallstates">Callstate desired</param>
         /// <returns>TapiCall array</returns>
-        public TapiCall[] FindCallsByCallState(CallState requestedCallstates)
+        public ITapiCall[] FindCallsByCallState(CallState requestedCallstates)
         {
             var calls = new List<TapiCall>();
             lock (_calls)
@@ -750,7 +750,7 @@ namespace JulMar.Atapi
         /// <param name="forwardInstructions">The forwarding instructions to apply</param>
         /// <param name="numRingsNoAnswer">Number of rings before a call is considered a "no answer." If dwNumRingsNoAnswer is out of range, the actual value is set to the nearest value in the allowable range.</param>
         /// <param name="param">Optional call parameters - only used if a consultation call is returned; otherwise ignored.  May be null for default parameters</param>
-        public TapiCall Forward(ForwardInfo[] forwardInstructions, int numRingsNoAnswer, MakeCallParams param)
+        public ITapiCall Forward(ForwardInfo[] forwardInstructions, int numRingsNoAnswer, MakeCallParams param)
         {
             if (!Line.IsOpen)
                 throw new TapiException("Line is not open", NativeMethods.LINEERR_OPERATIONUNAVAIL);
@@ -824,7 +824,7 @@ namespace JulMar.Atapi
         /// </summary>
         /// <param name="address">Number to dial</param>
         /// <returns>New <see>TapiCall</see> object.</returns>
-        public TapiCall MakeCall(string address)
+        public ITapiCall MakeCall(string address)
         {
             return MakeCall(address, 0, null);
         }
@@ -836,7 +836,7 @@ namespace JulMar.Atapi
         /// <param name="countryCode">Country code</param>
         /// <param name="param">Optional <see>MakeCallParams</see> to use while dialing</param>
         /// <returns>New <see cref="TapiCall"/> object.</returns>
-        public TapiCall MakeCall(string address, int countryCode, MakeCallParams param)
+        public ITapiCall MakeCall(string address, int countryCode, MakeCallParams param)
         {
             if (!Line.IsOpen)
                 throw new TapiException("Line is not open", NativeMethods.LINEERR_OPERATIONUNAVAIL);
@@ -883,7 +883,7 @@ namespace JulMar.Atapi
         /// <param name="alertingAddress">Address to retrieve call from</param>
         /// <param name="groupId">Optional group ID, can be null or empty</param>
         /// <returns>New <see cref="TapiCall"/> object.</returns>
-        public TapiCall Pickup(string alertingAddress, string groupId)
+        public ITapiCall Pickup(string alertingAddress, string groupId)
         {
             uint hCall;
             int rc = NativeMethods.linePickup(_lineOwner.Handle, _addressId, out hCall, alertingAddress, groupId);
@@ -914,7 +914,7 @@ namespace JulMar.Atapi
         /// <param name="mcp">Call parameters for created consultation call</param>
         /// <param name="consultCall">Returning consultation call</param>
         /// <returns>Conference call</returns>
-        public TapiCall SetupConference(int conferenceCount, MakeCallParams mcp, out TapiCall consultCall)
+        public ITapiCall SetupConference(int conferenceCount, MakeCallParams mcp, out TapiCall consultCall)
         {
             IntPtr lpCp = IntPtr.Zero;
             int callFlags = 0;
@@ -968,7 +968,7 @@ namespace JulMar.Atapi
         /// </summary>
         /// <param name="parkedAddress">Address to retrieve call from</param>
         /// <returns>New <see cref="TapiCall"/> object.</returns>
-        public TapiCall Unpark(string parkedAddress)
+        public ITapiCall Unpark(string parkedAddress)
         {
             uint hCall;
             int rc = NativeMethods.lineUnpark(_lineOwner.Handle, _addressId, out hCall, parkedAddress);

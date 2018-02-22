@@ -11,7 +11,7 @@ namespace JulMar.Atapi
         /// <summary>
         /// The available addresses on this line.
         /// </summary>
-        TapiAddress[] Addresses { get; }
+        ITapiAddress[] Addresses { get; }
 
         /// <summary>
         /// Returns the <see cref="LineCapabilities"/> object for this line.
@@ -151,7 +151,7 @@ namespace JulMar.Atapi
         /// </summary>
         /// <param name="number">DN to locate</param>
         /// <returns>TapiAddress or null if not found.</returns>
-        TapiAddress FindAddress(string number);
+        ITapiAddress FindAddress(string number);
 
         /// <summary>
         /// This forwards calls destined for all addresses on the specified line, according to the specified forwarding instructions. 
@@ -161,7 +161,7 @@ namespace JulMar.Atapi
         /// <param name="forwardInstructions">The forwarding instructions to apply</param>
         /// <param name="numRingsNoAnswer">Number of rings before a call is considered a "no answer." If dwNumRingsNoAnswer is out of range, the actual value is set to the nearest value in the allowable range.</param>
         /// <param name="param">Optional call parameters - only used if a consultation call is returned; otherwise ignored.  May be null for default parameters</param>
-        TapiCall Forward(ForwardInfo[] forwardInstructions, int numRingsNoAnswer, MakeCallParams param);
+        ITapiCall Forward(ForwardInfo[] forwardInstructions, int numRingsNoAnswer, MakeCallParams param);
 
         /// <summary>
         /// Returns the phone device associated with this line.
@@ -233,7 +233,7 @@ namespace JulMar.Atapi
         /// </summary>
         /// <param name="address">Number to dial</param>
         /// <returns><see cref="TapiCall"/> object or null.</returns>
-        TapiCall MakeCall(string address);
+        ITapiCall MakeCall(string address);
 
         /// <summary>
         /// This places a call on the first available address of the line.
@@ -242,7 +242,7 @@ namespace JulMar.Atapi
         /// <param name="country"><see cref="Country"/> object (null for default).</param>
         /// <param name="param">Optional <see cref="MakeCallParams"/> to use when dialing.</param>
         /// <returns><see cref="TapiCall"/> object or null.</returns>
-        TapiCall MakeCall(string address, Country country, MakeCallParams param);
+        ITapiCall MakeCall(string address, Country country, MakeCallParams param);
 
         /// <summary>
         /// This opens the line in non-owner (monitor) mode so that new and existing calls can be viewed but not manipulated.

@@ -544,7 +544,7 @@ namespace JulMar.Atapi
                     {
                         TapiCall call = TapiCall.FindCallByHandle(msg.hDevice);
                         if (call != null)
-                            call.Line.OnDeviceSpecific(call, msg.dwParam1, msg.dwParam2, msg.dwParam3);
+                            ((TapiLine)call.Line).OnDeviceSpecific(call, msg.dwParam1, msg.dwParam2, msg.dwParam3);
                         else
                             goto case TapiEvent.LINE_CLOSE;
                     }

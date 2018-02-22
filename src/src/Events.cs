@@ -217,7 +217,7 @@ namespace JulMar.Atapi
         /// <summary>
         /// The line that is ringing
         /// </summary>
-        public readonly TapiLine Line;
+        public readonly ITapiLine Line;
         /// <summary>
         /// The number of rings which have occurred.
         /// </summary>
@@ -230,7 +230,7 @@ namespace JulMar.Atapi
         /// <summary>
         /// Constructor
         /// </summary>
-        internal RingEventArgs(TapiLine line, int mode, int rcount)
+        internal RingEventArgs(ITapiLine line, int mode, int rcount)
         {
             Line = line;
             RingerStyle = mode;
@@ -266,12 +266,12 @@ namespace JulMar.Atapi
         /// <summary>
         /// The line which has changed.
         /// </summary>
-        public readonly TapiLine Line;
+        public readonly ITapiLine Line;
         /// <summary>
         /// The change(s) which have occurred.
         /// </summary>
         public readonly LineInfoChangeTypes Change;
-        internal LineInfoChangeEventArgs(TapiLine line, LineInfoChangeTypes change)
+        internal LineInfoChangeEventArgs(ITapiLine line, LineInfoChangeTypes change)
         {
             Line = line;
             Change = change;
@@ -331,11 +331,11 @@ namespace JulMar.Atapi
         /// <summary>
         /// The line associated with the Device Specific request
         /// </summary>
-        public readonly TapiLine Line;
+        public readonly ITapiLine Line;
         /// <summary>
         /// The call associated with the device specific request (may be null).
         /// </summary>
-        public readonly TapiCall Call;
+        public readonly ITapiCall Call;
         /// <summary>
         /// The phone associated with the device specific request (may be null).
         /// </summary>

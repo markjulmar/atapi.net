@@ -1650,7 +1650,7 @@ namespace JulMar.Atapi
         /// Returns the line device associated with this phone.
         /// </summary>
         /// <returns>TapiLine</returns>
-        public TapiLine GetAssociatedLine()
+        public ITapiLine GetAssociatedLine()
         {
             if (_mgr.Lines.Length > 0)
             {

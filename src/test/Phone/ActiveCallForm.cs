@@ -12,11 +12,11 @@ namespace Phone
 {
     public partial class ActiveCallForm : Form
     {
-        private TapiCall _call;
+        private ITapiCall _call;
 
-        public ActiveCallForm(TapiCall call)
+        public ActiveCallForm(ITapiCall call)
         {
-            TapiLine line = call.Line;
+            var line = call.Line;
 
             _call = call;
             line.CallInfoChanged += OnCallInfoChange;
@@ -121,7 +121,7 @@ namespace Phone
             SelectCallForm scf = new SelectCallForm(_call.Line);
             if (scf.ShowDialog() == DialogResult.OK)
             {
-                TapiCall otherCall = scf.SelectedCall;
+                var otherCall = scf.SelectedCall;
                 if (otherCall != null && otherCall != _call)
                 {
                     _call.SwapHold(otherCall);

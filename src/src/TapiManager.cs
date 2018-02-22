@@ -639,7 +639,17 @@ namespace JulMar.Atapi
                 case TapiEvent.LINE_CREATE:
                     {
                         var newLine = new TapiLine(this, msg.dwParam1.ToInt32());
-                        lock (_lineArray)
+                        
+			// 20180222 - Issue #11 Added event handler initialization
+                        newLine.NewCall += HandleNewCall;
+                        newLine.CallStateChanged += HandleCallStateChanged;
+                        newLine.CallInfoChanged += HandleCallInfoChanged;
+                        newLine.AddressChanged += HandleAddressChanged;
+                        newLine.Changed += HandleLineChanged;
+                        newLine.Ringing += HandleLineRinging;
+                        // End of Change for #11
+			
+			lock (_lineArray)
                         {
                             _lineArray.Add(newLine);
                         }

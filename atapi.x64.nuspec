@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/10/nuspec.xsd">
+  <metadata>
+    <id>ATAPI.X64</id>
+    <title>TAPI2 64-bit managed library for .NET</title>
+    <version>2018.3.09.00</version>
+    <authors>Mark Smith</authors>
+    <owners>JulMar Technology,Inc.</owners>
+    <licenseUrl>https://github.com/markjulmar/atapi.net/blob/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/markjulmar/atapi.net</projectUrl>
+    <iconUrl>http://www.julmar.com/images/atapi.png</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>ATAPI is a .NET managed library wrapper for working with the Windows Telephony API (TAPI2).</description>
+    <releaseNotes></releaseNotes>
+    <copyright>(C) 2008-2018 JulMar Technology, Inc.</copyright>
+    <language>en-US</language>
+    <tags>.NET TAPI telephony telephone modem</tags>
+  </metadata>
+  <files>
+    <file src="src\src\bin\x64\Release\atapi.dll" target="lib\net46\atapi.dll" />
+    <file src="src\src\bin\x64\Release\atapi.xml" target="lib\net46\atapi.xml" />
+    <file src="atapi.png" target="atapi.png" />
+  </files>
+</package>

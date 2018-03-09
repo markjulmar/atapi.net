@@ -8,7 +8,7 @@
     <owners>JulMar Technology,Inc.</owners>
     <licenseUrl>https://github.com/markjulmar/atapi.net/blob/master/LICENSE</licenseUrl>
     <projectUrl>https://github.com/markjulmar/atapi.net</projectUrl>
-    <iconUrl>http://www.julmar.com/images/atapi.png</iconUrl>
+    <iconUrl>https://raw.githubusercontent.com/markjulmar/atapi.net/master/Atapi.png</iconUrl>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
     <description>ATAPI is a .NET managed library wrapper for working with the Windows Telephony API (TAPI2).</description>
     <releaseNotes></releaseNotes>

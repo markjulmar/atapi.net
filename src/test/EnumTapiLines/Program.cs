@@ -3,7 +3,7 @@ using JulMar.Atapi;
 
 namespace EnumTapiLines
 {
-    class Program
+    static class Program
     {
         static void Main(string[] args)
         {

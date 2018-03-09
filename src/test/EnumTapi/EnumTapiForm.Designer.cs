@@ -154,7 +154,7 @@ namespace EnumTapi
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
             this.Name = "EnumTapiForm";
-            this.Text = "EnumTAPI (c) 2005-2013 JulMar Technology, Inc.";
+            this.Text = "EnumTAPI (c) 2005-2018 JulMar Technology, Inc.";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.EnumTapiForm_FormClosing);
             this.Load += new System.EventHandler(this.Form1_Load);
             this.ResumeLayout(false);

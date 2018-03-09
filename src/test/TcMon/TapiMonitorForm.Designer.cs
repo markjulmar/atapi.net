@@ -30,11 +30,11 @@ namespace TcMon
         {
             this.components = new System.ComponentModel.Container();
             this.lvCalls = new System.Windows.Forms.ListView();
-            this.columnHeader1 = new System.Windows.Forms.ColumnHeader();
-            this.columnHeader2 = new System.Windows.Forms.ColumnHeader();
-            this.columnHeader3 = new System.Windows.Forms.ColumnHeader();
-            this.columnHeader4 = new System.Windows.Forms.ColumnHeader();
-            this.columnHeader5 = new System.Windows.Forms.ColumnHeader();
+            this.columnHeader1 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader2 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader3 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader4 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.columnHeader5 = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.btnAccept = new System.Windows.Forms.Button();
             this.btnAnswer = new System.Windows.Forms.Button();
             this.btnDrop = new System.Windows.Forms.Button();
@@ -48,9 +48,9 @@ namespace TcMon
             // 
             // lvCalls
             // 
-            this.lvCalls.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
-                        | System.Windows.Forms.AnchorStyles.Left)
-                        | System.Windows.Forms.AnchorStyles.Right)));
+            this.lvCalls.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.lvCalls.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
             this.columnHeader1,
             this.columnHeader2,
@@ -59,10 +59,11 @@ namespace TcMon
             this.columnHeader5});
             this.lvCalls.HeaderStyle = System.Windows.Forms.ColumnHeaderStyle.Nonclickable;
             this.lvCalls.HideSelection = false;
-            this.lvCalls.Location = new System.Drawing.Point(12, 12);
+            this.lvCalls.Location = new System.Drawing.Point(24, 23);
+            this.lvCalls.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
             this.lvCalls.MultiSelect = false;
             this.lvCalls.Name = "lvCalls";
-            this.lvCalls.Size = new System.Drawing.Size(589, 146);
+            this.lvCalls.Size = new System.Drawing.Size(1174, 277);
             this.lvCalls.TabIndex = 0;
             this.lvCalls.UseCompatibleStateImageBehavior = false;
             this.lvCalls.View = System.Windows.Forms.View.Details;
@@ -96,9 +97,10 @@ namespace TcMon
             // 
             this.btnAccept.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
             this.btnAccept.Enabled = false;
-            this.btnAccept.Location = new System.Drawing.Point(120, 164);
+            this.btnAccept.Location = new System.Drawing.Point(240, 315);
+            this.btnAccept.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
             this.btnAccept.Name = "btnAccept";
-            this.btnAccept.Size = new System.Drawing.Size(75, 23);
+            this.btnAccept.Size = new System.Drawing.Size(150, 44);
             this.btnAccept.TabIndex = 1;
             this.btnAccept.Text = "Accept";
             this.btnAccept.UseVisualStyleBackColor = true;
@@ -108,9 +110,10 @@ namespace TcMon
             // 
             this.btnAnswer.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
             this.btnAnswer.Enabled = false;
-            this.btnAnswer.Location = new System.Drawing.Point(201, 164);
+            this.btnAnswer.Location = new System.Drawing.Point(402, 315);
+            this.btnAnswer.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
             this.btnAnswer.Name = "btnAnswer";
-            this.btnAnswer.Size = new System.Drawing.Size(75, 23);
+            this.btnAnswer.Size = new System.Drawing.Size(150, 44);
             this.btnAnswer.TabIndex = 2;
             this.btnAnswer.Text = "Answer";
             this.btnAnswer.UseVisualStyleBackColor = true;
@@ -120,9 +123,10 @@ namespace TcMon
             // 
             this.btnDrop.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
             this.btnDrop.Enabled = false;
-            this.btnDrop.Location = new System.Drawing.Point(282, 164);
+            this.btnDrop.Location = new System.Drawing.Point(564, 315);
+            this.btnDrop.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
             this.btnDrop.Name = "btnDrop";
-            this.btnDrop.Size = new System.Drawing.Size(75, 23);
+            this.btnDrop.Size = new System.Drawing.Size(150, 44);
             this.btnDrop.TabIndex = 3;
             this.btnDrop.Text = "Drop";
             this.btnDrop.UseVisualStyleBackColor = true;
@@ -132,9 +136,10 @@ namespace TcMon
             // 
             this.btnHold.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
             this.btnHold.Enabled = false;
-            this.btnHold.Location = new System.Drawing.Point(363, 164);
+            this.btnHold.Location = new System.Drawing.Point(726, 315);
+            this.btnHold.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
             this.btnHold.Name = "btnHold";
-            this.btnHold.Size = new System.Drawing.Size(75, 23);
+            this.btnHold.Size = new System.Drawing.Size(150, 44);
             this.btnHold.TabIndex = 4;
             this.btnHold.Text = "Hold";
             this.btnHold.UseVisualStyleBackColor = true;
@@ -144,9 +149,10 @@ namespace TcMon
             // 
             this.btnUnhold.Anchor = System.Windows.Forms.AnchorStyles.Bottom;
             this.btnUnhold.Enabled = false;
-            this.btnUnhold.Location = new System.Drawing.Point(444, 164);
+            this.btnUnhold.Location = new System.Drawing.Point(888, 315);
+            this.btnUnhold.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
             this.btnUnhold.Name = "btnUnhold";
-            this.btnUnhold.Size = new System.Drawing.Size(75, 23);
+            this.btnUnhold.Size = new System.Drawing.Size(150, 44);
             this.btnUnhold.TabIndex = 5;
             this.btnUnhold.Text = "Unhold";
             this.btnUnhold.UseVisualStyleBackColor = true;
@@ -154,18 +160,20 @@ namespace TcMon
             // 
             // statusStrip1
             // 
+            this.statusStrip1.ImageScalingSize = new System.Drawing.Size(32, 32);
             this.statusStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripStatusLabel1});
-            this.statusStrip1.Location = new System.Drawing.Point(0, 190);
+            this.statusStrip1.Location = new System.Drawing.Point(0, 371);
             this.statusStrip1.Name = "statusStrip1";
-            this.statusStrip1.Size = new System.Drawing.Size(613, 22);
+            this.statusStrip1.Padding = new System.Windows.Forms.Padding(2, 0, 28, 0);
+            this.statusStrip1.Size = new System.Drawing.Size(1226, 37);
             this.statusStrip1.TabIndex = 6;
             this.statusStrip1.Text = "statusStrip1";
             // 
             // toolStripStatusLabel1
             // 
             this.toolStripStatusLabel1.Name = "toolStripStatusLabel1";
-            this.toolStripStatusLabel1.Size = new System.Drawing.Size(598, 17);
+            this.toolStripStatusLabel1.Size = new System.Drawing.Size(1196, 32);
             this.toolStripStatusLabel1.Spring = true;
             this.toolStripStatusLabel1.Text = "Ready";
             this.toolStripStatusLabel1.TextAlign = System.Drawing.ContentAlignment.MiddleLeft;
@@ -177,9 +185,9 @@ namespace TcMon
             // 
             // TapiMonitorForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(12F, 25F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(613, 212);
+            this.ClientSize = new System.Drawing.Size(1226, 408);
             this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.btnUnhold);
             this.Controls.Add(this.btnHold);
@@ -187,10 +195,11 @@ namespace TcMon
             this.Controls.Add(this.btnAnswer);
             this.Controls.Add(this.btnAccept);
             this.Controls.Add(this.lvCalls);
+            this.Margin = new System.Windows.Forms.Padding(6, 6, 6, 6);
             this.Name = "TapiMonitorForm";
-            this.Text = "Tapi Call Monitor (C) 2006-2008 JulMar Technology, Inc.";
-            this.Load += new System.EventHandler(this.TapiMonitorForm_Load);
+            this.Text = "Tapi Call Monitor (C) 2006-2018 JulMar Technology, Inc.";
             this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.TapiMonitorForm_FormClosing);
+            this.Load += new System.EventHandler(this.TapiMonitorForm_Load);
             this.statusStrip1.ResumeLayout(false);
             this.statusStrip1.PerformLayout();
             this.ResumeLayout(false);

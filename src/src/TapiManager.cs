@@ -138,6 +138,7 @@ namespace JulMar.Atapi
             if (numLines > 0 || numPhones > 0)
             {
                 _workerThread = new Thread(ProcessTapiMessages) { Name = "Tapi Message Processor" };
+                _workerThread.IsBackground = true;
                 _workerThread.Start();
                 ReadProviderList();
                 _locInfo = new LocationInformation(this);

@@ -28,14 +28,14 @@ using System.Globalization;
 
 namespace JulMar.Atapi
 {
-	/// <summary>
-	/// The TapiManager class is the starting point for the library.  It does the initial negotiation with TAPI
+    /// <summary>
+    /// The TapiManager class is the starting point for the library.  It does the initial negotiation with TAPI
     /// and maintains the list of lines which can be worked with.
-	/// </summary>
-	public sealed class TapiManager : IDisposable
+    /// </summary>
+    public sealed class TapiManager : IDisposable
     {
-	    private const int RequestTimeoutSeconds = 5;
-	    private readonly string _appName;
+        private const int RequestTimeoutSeconds = 5;
+        private readonly string _appName;
         private HTLINEAPP _hTapiLine = new HTLINEAPP();
         private HTPHONEAPP _hTapiPhone = new HTPHONEAPP();
         private int _lineVersion;
@@ -115,11 +115,11 @@ namespace JulMar.Atapi
         public TapiManager(string appName, TapiVersion ver)
         {
             _appName = appName;
-            _lineVersion = (int) ver;
+            _lineVersion = (int)ver;
             _phoneVersion = (int)ver;
             _lineArray = new List<TapiLine>();
             _phoneArray = new List<TapiPhone>();
-		}
+        }
 
         /// <summary>
         /// This method initializes the TAPI infrastructure.
@@ -137,8 +137,11 @@ namespace JulMar.Atapi
 
             if (numLines > 0 || numPhones > 0)
             {
-                _workerThread = new Thread(ProcessTapiMessages) { Name = "Tapi Message Processor" };
-                _workerThread.IsBackground = true;
+                _workerThread = new Thread(ProcessTapiMessages)
+                {
+                    Name = "Tapi Message Processor",
+                    IsBackground = true,
+                };
                 _workerThread.Start();
                 ReadProviderList();
                 _locInfo = new LocationInformation(this);
@@ -266,7 +269,7 @@ namespace JulMar.Atapi
                 }
             }
 
-            try 
+            try
             {
                 _hTapiLine.Close();
             }
@@ -339,9 +342,9 @@ namespace JulMar.Atapi
             Marshal.PtrToStructure(pLpe, lpe);
             Marshal.FreeHGlobal(pLpe);
 
-            return new TapiProvider(lpe.dwPermanentProviderID, 
-                NativeMethods.GetString(rawBuffer, 
-                lpe.dwProviderFilenameOffset, lpe.dwProviderFilenameSize, 
+            return new TapiProvider(lpe.dwPermanentProviderID,
+                NativeMethods.GetString(rawBuffer,
+                lpe.dwProviderFilenameOffset, lpe.dwProviderFilenameSize,
                 NativeMethods.STRINGFORMAT_UNICODE));
         }
 
@@ -410,7 +413,7 @@ namespace JulMar.Atapi
         /// Processes the TAPI messages
         /// </summary>
 		private void ProcessTapiMessages()
-		{
+        {
             var arrWait = new WaitHandle[] { _evtStop, _evtReceivedLineEvent, _evtReceivedPhoneEvent };
             var msg = new LINEMESSAGE();
             ProcessTapiMessageDelegate ptmCb = ProcessTapiMessage;
@@ -463,7 +466,7 @@ namespace JulMar.Atapi
                         }, null);
                 }
             }
-		}
+        }
 
         delegate void ProcessTapiMessageDelegate(LINEMESSAGE msg);
 
@@ -475,13 +478,13 @@ namespace JulMar.Atapi
                     {
                         TapiCall call = TapiCall.FindCallByHandle(msg.hDevice);
                         if (call != null)
-                            call.OnCallStateChange(msg.dwParam1.ToInt32(), msg.dwParam2, (MediaModes) msg.dwParam3.ToInt32());
+                            call.OnCallStateChange(msg.dwParam1.ToInt32(), msg.dwParam2, (MediaModes)msg.dwParam3.ToInt32());
                         else
                         {
                             // Call doesn't exist (yet), wait for a LINE_REPLY to add the call.
                             lock (_pendingCallStateMessages)
                             {
-                                _pendingCallStateMessages.Add(Tuple.Create(DateTime.Now,msg));
+                                _pendingCallStateMessages.Add(Tuple.Create(DateTime.Now, msg));
                             }
                         }
                     }
@@ -587,7 +590,7 @@ namespace JulMar.Atapi
                 case TapiEvent.PHONE_REPLY:
                     HandleCompletion(msg.dwParam1.ToInt32(), msg.dwParam2);
                     break;
-                
+
                 case TapiEvent.PHONE_STATE:
                     break;
 
@@ -648,7 +651,7 @@ namespace JulMar.Atapi
                         newLine.AddressChanged += HandleAddressChanged;
                         newLine.Changed += HandleLineChanged;
                         newLine.Ringing += HandleLineRinging;
-                        
+
                         lock (_lineArray)
                         {
                             _lineArray.Add(newLine);
@@ -679,7 +682,7 @@ namespace JulMar.Atapi
                     HandleCompletion(msg.dwParam1.ToInt32(), msg.dwParam2);
                     break;
 
-                
+
                 default:
                     break;
             }
@@ -688,7 +691,7 @@ namespace JulMar.Atapi
         internal void HandleCompletion(int reqId, IntPtr finalResult)
         {
             DateTime timeEntered = DateTime.Now;
-            for (; ;)
+            for (; ; )
             {
                 // Wait up to 5 seconds for a completion event to show up.
                 if ((DateTime.Now - timeEntered).TotalSeconds > RequestTimeoutSeconds)
@@ -712,11 +715,11 @@ namespace JulMar.Atapi
             }
         }
 
-		private void HandleNewCall(object sender, NewCallEventArgs e)
-		{
+        private void HandleNewCall(object sender, NewCallEventArgs e)
+        {
             if (NewCall != null)
                 NewCall(this, e);
-		}
+        }
 
         private void HandleCallStateChanged(object sender, CallStateEventArgs e)
         {
@@ -776,7 +779,7 @@ namespace JulMar.Atapi
         /// to an async request creating calls.
         /// </summary>
 	    internal void ReportQueuedCallStateChanges()
-	    {
+        {
             lock (_pendingCallStateMessages)
             {
                 for (int i = 0; i < _pendingCallStateMessages.Count; i++)
@@ -787,7 +790,7 @@ namespace JulMar.Atapi
                     TapiCall call = TapiCall.FindCallByHandle(msg.hDevice);
                     if (call != null)
                     {
-                        call.OnCallStateChange(msg.dwParam1.ToInt32(), msg.dwParam2, (MediaModes) msg.dwParam3.ToInt32());
+                        call.OnCallStateChange(msg.dwParam1.ToInt32(), msg.dwParam2, (MediaModes)msg.dwParam3.ToInt32());
                         remove = true;
                     }
                     // Not found - has it been queued up too long?
@@ -804,6 +807,6 @@ namespace JulMar.Atapi
                     }
                 }
             }
-	    }
+        }
     }
 }

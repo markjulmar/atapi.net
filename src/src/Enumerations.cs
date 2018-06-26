@@ -52,6 +52,7 @@ namespace JulMar.Atapi
 
     /// <summary>
     /// Supported TAPI versions
+    /// more info: https://msdn.microsoft.com/en-us/library/ms737251
     /// </summary>
     public enum TapiVersion
     {
@@ -68,9 +69,13 @@ namespace JulMar.Atapi
         /// </summary>
         V20 = 0x20000,
         /// <summary>
-        /// TAPI 2.1 - update
+        /// TAPI 2.1 - Windows NT 4.0 with SP4 and Windows 98
         /// </summary>
         V21 = 0x20001,
+        /// <summary>
+        /// TAPI 2.2 - Windows Server 2003, Windows XP, and Windows 2000.
+        /// </summary>
+        V22 = 0x00020002,
         /// <summary>
         /// TAPI 3.0 - Windows 2000
         /// </summary>

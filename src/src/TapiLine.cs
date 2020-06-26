@@ -54,7 +54,7 @@ namespace JulMar.Atapi
             if (_ldc.dwDeviceClassesSize > 0)
             {
                 var arr = new List<String>(); int spos = _ldc.dwDeviceClassesOffset;
-                for (int epos = _ldc.dwDeviceClassesOffset; epos < _ldc.dwDeviceClassesOffset + _ldc.dwDeviceClassesSize - 2; epos++)
+                for (int epos = _ldc.dwDeviceClassesOffset; epos < _rawBuffer.Length && epos < _ldc.dwDeviceClassesOffset + _ldc.dwDeviceClassesSize - 2; epos++)
                 {
                     char ch = BitConverter.ToChar(_rawBuffer, epos);
                     if (ch == '\0')

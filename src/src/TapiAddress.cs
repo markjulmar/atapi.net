@@ -446,7 +446,7 @@ namespace JulMar.Atapi
                     for (int i = 0; i < _las.dwForwardNumEntries; i++)
                     {
                         var lfw = new LINEFORWARD();
-                        int size = Marshal.SizeOf(lfw);
+                        int size = _las.dwForwardSize;
                         int pos = i * size;
                         IntPtr pLpe = Marshal.AllocHGlobal(size);
                         Marshal.Copy(_rawBuffer, pos + _las.dwForwardOffset, pLpe, size);

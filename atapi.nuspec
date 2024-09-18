@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/10/nuspec.xsd">
+  <metadata>
+    <id>ATAPI</id>
+    <title>TAPI2 managed library for .NET</title>
+    <version>2018.3.09.01</version>
+    <authors>Mark Smith</authors>
+    <owners>JulMar Technology, Inc.</owners>
+    <license type="expression">MIT</license>
+    <projectUrl>https://github.com/markjulmar/atapi.net</projectUrl>
+    <repository type="git" url="https://github.com/markjulmar/atapi.net" branch="master" />
+    <icon>atapi.png</icon>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>ATAPI is a .NET managed library wrapper for working with the Windows Telephony API (TAPI2).</description>
+    <releaseNotes></releaseNotes>
+    <copyright>(C) 2008-2024 JulMar Technology, Inc.</copyright>
+    <language>en-US</language>
+    <tags>.NET TAPI telephony telephone modem</tags>
+    <readme>README.md</readme>    
+    <dependencies>
+      <group targetFramework="net48" />
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="atapi.targets" target="build\atapi.targets" />
+    <file src="atapi.props" target="build\atapi.props" />
+    
+    <!-- x86 -->
+    <file src="src\src\bin\x86\Release\atapi.dll" target="build\x86\atapi.dll" />
+    <file src="src\src\bin\x86\Release\atapi.xml" target="build\x86\atapi.xml" />
+    <file src="src\src\bin\x86\Release\atapi.pdb" target="build\x86\atapi.pdb" />
+
+    <!-- x64 -->
+    <file src="src\src\bin\x64\Release\atapi.dll" target="build\x64\atapi.dll" />
+    <file src="src\src\bin\x64\Release\atapi.xml" target="build\x64\atapi.xml" />
+    <file src="src\src\bin\x64\Release\atapi.pdb" target="build\x64\atapi.pdb" />
+
+    <!-- ARM64 -->
+    <file src="src\src\bin\ARM64\Release\atapi.dll" target="build\ARM64\atapi.dll" />
+    <file src="src\src\bin\ARM64\Release\atapi.xml" target="build\ARM64\atapi.xml" />
+    <file src="src\src\bin\ARM64\Release\atapi.pdb" target="build\ARM64\atapi.pdb" />
+
+    <!-- extra -->
+    <file src="atapi.png" target="atapi.png" />
+    <file src="README.md" target="README.md" />
+  </files>
+</package>

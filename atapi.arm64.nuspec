@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package xmlns="http://schemas.microsoft.com/packaging/2011/10/nuspec.xsd">
   <metadata>
-    <id>ATAPI.X64</id>
-    <title>TAPI2 64-bit managed library for .NET</title>
+    <id>ATAPI.ARM64</id>
+    <title>TAPI2 64-bit (ARM) managed library for .NET</title>
     <version>2018.3.09.01</version>
     <authors>Mark Smith</authors>
     <owners>JulMar Technology,Inc.</owners>
@@ -19,7 +19,6 @@
   <files>
     <file src="src\src\bin\x64\Release\atapi.dll" target="lib\net46\atapi.dll" />
     <file src="src\src\bin\x64\Release\atapi.xml" target="lib\net46\atapi.xml" />
-    <file src="src\src\bin\x64\Release\atapi.pdb" target="lib\net46\atapi.pdb" />
     <file src="atapi.png" target="atapi.png" />
   </files>
 </package>

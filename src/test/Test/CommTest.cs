@@ -21,7 +21,7 @@ namespace EnumDevices
             if (line != null)
             {
                 line.Open(MediaModes.DataModem);
-                TapiCall call = line.Addresses[0].MakeCall("2145551212");
+                var call = line.Addresses[0].MakeCall("2145551212");
 
                 Console.WriteLine(call.GetCommDevice());
 

@@ -11,14 +11,14 @@ Imports System.Runtime.InteropServices
 <Assembly: AssemblyTitle("VBTest")> 
 <Assembly: AssemblyDescription("")> 
 <Assembly: AssemblyCompany("JulMar Technology, Inc.")> 
-<Assembly: AssemblyProduct("VBTest")> 
-<Assembly: AssemblyCopyright("Copyright © JulMar Technology, Inc. 2006")> 
+<Assembly: AssemblyProduct("VBTest")>
+<Assembly: AssemblyCopyright("Copyright © JulMar Technology, Inc. 2006-2024")>
 <Assembly: AssemblyTrademark("")> 
 
 <Assembly: ComVisible(False)>
 
 'The following GUID is for the ID of the typelib if this project is exposed to COM
-<Assembly: Guid("a871ecdb-8dec-41c8-9fe1-460902b5932c")> 
+<Assembly: Guid("a871ecdb-8dec-41c8-9fe1-460902b5932c")>
 
 ' Version information for an assembly consists of the following four values:
 '
@@ -31,5 +31,5 @@ Imports System.Runtime.InteropServices
 ' by using the '*' as shown below:
 ' <Assembly: AssemblyVersion("1.0.*")> 
 
-<Assembly: AssemblyVersion("1.0.0.0")> 
-<Assembly: AssemblyFileVersion("1.0.0.0")> 
+<Assembly: AssemblyVersion("1.0.0.1")>
+<Assembly: AssemblyFileVersion("1.0.0.1")>

@@ -221,7 +221,7 @@ namespace JulMar.Atapi
         /// </summary>
         public AnswerModes AnswerMode
         {
-            get { return (AnswerModes) _ldc.dwAnswerMode; }
+            get { return (AnswerModes)_ldc.dwAnswerMode; }
         }
 
         /// <summary>
@@ -419,7 +419,7 @@ namespace JulMar.Atapi
         /// </summary>
         public string[] AvailableDeviceClasses
         {
-            get { return (string[]) _devClasses.Clone(); }
+            get { return (string[])_devClasses.Clone(); }
         }
 
         /// <summary>
@@ -520,7 +520,7 @@ namespace JulMar.Atapi
         /// </summary>
         public MediaModes OpenMediaModes
         {
-            get { return (MediaModes) _lds.dwOpenMediaModes; }
+            get { return (MediaModes)_lds.dwOpenMediaModes; }
         }
 
         /// <summary>
@@ -663,7 +663,7 @@ namespace JulMar.Atapi
         /// </summary>
         public bool Connected
         {
-            get { return (_lds.dwDevStatusFlags & NativeMethods.LINEDEVSTATUSFLAGS_CONNECTED) > 0;}
+            get { return (_lds.dwDevStatusFlags & NativeMethods.LINEDEVSTATUSFLAGS_CONNECTED) > 0; }
             set { _lineOwner.SetDeviceState(NativeMethods.LINEDEVSTATUSFLAGS_CONNECTED, value); }
         }
 
@@ -685,7 +685,7 @@ namespace JulMar.Atapi
         /// </summary>
         public MediaModes AvailableMediaModes
         {
-            get { return (MediaModes) _lds.dwAvailableMediaModes; }
+            get { return (MediaModes)_lds.dwAvailableMediaModes; }
         }
 
         /// <summary>
@@ -763,12 +763,12 @@ namespace JulMar.Atapi
     /// </summary>
     public sealed class TapiLine : IDisposable, ITapiLine
     {
-        private const int MinTapiVersion = (int) TapiVersion.V13;
-        private const int MaxTapiVersion = (int) TapiVersion.V31;
+        private const int MinTapiVersion = (int)TapiVersion.V13;
+        private const int MaxTapiVersion = (int)TapiVersion.V31;
 
         private readonly TapiManager _mgr;
-		private readonly int _deviceId;
-		private readonly int _negotiatedVersion;
+        private readonly int _deviceId;
+        private readonly int _negotiatedVersion;
         private int _negotiatedExtVersion;
         private readonly int _stringFormat;
         private string _lineName = string.Empty;
@@ -811,13 +811,13 @@ namespace JulMar.Atapi
         /// <param name="mgr">Owner</param>
         /// <param name="deviceId">Device ID for this line</param>
 		internal TapiLine(TapiManager mgr, int deviceId)
-		{
+        {
             _mgr = mgr;
-			_deviceId = deviceId;
+            _deviceId = deviceId;
             _lcb = LineCallback;
 
             LINEEXTENSIONID extId;
-            int rc = NativeMethods.lineNegotiateAPIVersion(_mgr.LineHandle, _deviceId, 
+            int rc = NativeMethods.lineNegotiateAPIVersion(_mgr.LineHandle, _deviceId,
                         MinTapiVersion, MaxTapiVersion, out _negotiatedVersion, out extId);
             if (rc == NativeMethods.LINEERR_OK)
             {
@@ -832,9 +832,9 @@ namespace JulMar.Atapi
                 {
                     _addresses[i] = new TapiAddress(this, i);
                     // Forward events from this address
-                    _addresses[i].Changed += delegate(object sender, AddressInfoChangeEventArgs e) { if (AddressChanged != null) AddressChanged(this, e); };
-                    _addresses[i].CallStateChanged += delegate(object sender, CallStateEventArgs e) { if (CallStateChanged != null) CallStateChanged(this, e); };
-                    _addresses[i].CallInfoChanged += delegate(object sender, CallInfoChangeEventArgs e) { if (CallInfoChanged != null) CallInfoChanged(this, e); };
+                    _addresses[i].Changed += delegate (object sender, AddressInfoChangeEventArgs e) { if (AddressChanged != null) AddressChanged(this, e); };
+                    _addresses[i].CallStateChanged += delegate (object sender, CallStateEventArgs e) { if (CallStateChanged != null) CallStateChanged(this, e); };
+                    _addresses[i].CallInfoChanged += delegate (object sender, CallInfoChangeEventArgs e) { if (CallInfoChanged != null) CallInfoChanged(this, e); };
                 }
 
                 _extensionId = String.Format(CultureInfo.CurrentCulture, "{0}.{1}.{2}.{3}", extId.dwExtensionID0, extId.dwExtensionID1, extId.dwExtensionID2, extId.dwExtensionID3);
@@ -845,7 +845,7 @@ namespace JulMar.Atapi
                 _addresses = new TapiAddress[0];
                 _props = new LineCapabilities(new LINEDEVCAPS(), null);
             }
-		}
+        }
 
         private LINEDEVCAPS GatherDevCaps()
         {
@@ -870,7 +870,7 @@ namespace JulMar.Atapi
                     rawBuffer = new byte[ldc.dwUsedSize];
                     Marshal.Copy(pLdc, rawBuffer, 0, ldc.dwUsedSize);
                 }
-				Marshal.FreeHGlobal(pLdc);
+                Marshal.FreeHGlobal(pLdc);
             }
             while (rc == NativeMethods.LINEERR_STRUCTURETOOSMALL);
             _props = new LineCapabilities(ldc, rawBuffer);
@@ -947,9 +947,9 @@ namespace JulMar.Atapi
         /// The numeric device ID representing the line.
         /// </summary>
 		public int Id
-		{ 
+        {
             get { return _deviceId; }
-		}
+        }
 
         /// <summary>
         /// The permanent numeric ID representing this line
@@ -963,9 +963,9 @@ namespace JulMar.Atapi
         /// The <see cref="TapiVersion"/> that this line negotiated to.
         /// </summary>
 		public TapiVersion NegotiatedVersion
-		{ 
-            get { return (TapiVersion) _negotiatedVersion; }
-		}
+        {
+            get { return (TapiVersion)_negotiatedVersion; }
+        }
 
         /// <summary>
         /// This associates an arbitrary object with the line device
@@ -988,7 +988,7 @@ namespace JulMar.Atapi
             }
 
             _devsCallback = dsc;
-            
+
             // Must re-read dev caps
             GatherDevCaps();
 
@@ -1009,7 +1009,7 @@ namespace JulMar.Atapi
         /// </summary>
         public ITapiAddress[] Addresses
         {
-            get { return (TapiAddress[]) _addresses.Clone(); }
+            get { return (TapiAddress[])_addresses.Clone(); }
         }
 
         /// <summary>
@@ -1060,7 +1060,7 @@ namespace JulMar.Atapi
         /// </summary>
         public string Name
         {
-            get 
+            get
             {
                 if (_lineName.Length == 0 && _props != null)
                     _lineName = _props.LineName;
@@ -1091,9 +1091,9 @@ namespace JulMar.Atapi
         /// </summary>
         /// <returns>String</returns>
 		public override string ToString()
-		{
-			return Name;
-		}
+        {
+            return Name;
+        }
 
         /// <summary>
         /// Returns true/false whether the line is currently open.
@@ -1137,7 +1137,7 @@ namespace JulMar.Atapi
         /// <param name="mediaMode"></param>
         /// <param name="addressId">Address ID to open (-1 for all)</param>
         private void Open(Privilege openMode, MediaModes mediaMode, int addressId)
-		{
+        {
             if (IsOpen)
                 throw new TapiException("Line is already open", NativeMethods.LINEERR_OPERATIONUNAVAIL);
 
@@ -1155,7 +1155,7 @@ namespace JulMar.Atapi
 
             uint hLine;
             int rc = NativeMethods.lineOpen(_mgr.LineHandle, _deviceId, out hLine, _negotiatedVersion, _negotiatedExtVersion,
-                Marshal.GetFunctionPointerForDelegate(_lcb), privilege, (int) mediaMode, ref lcp);
+                Marshal.GetFunctionPointerForDelegate(_lcb), privilege, (int)mediaMode, ref lcp);
 
             if (rc == NativeMethods.LINEERR_OK)
             {
@@ -1177,7 +1177,7 @@ namespace JulMar.Atapi
             }
             else
                 throw new TapiException("lineOpen failed", rc);
-		}
+        }
 
         /// <summary>
         /// This closes the line device.
@@ -1233,8 +1233,8 @@ namespace JulMar.Atapi
         /// <returns><see cref="TapiCall"/> object or null.</returns>
         public ITapiCall MakeCall(string address, Country country, MakeCallParams param)
         {
-            return (from addr in Addresses 
-                    where addr.Status.CanMakeCall 
+            return (from addr in Addresses
+                    where addr.Status.CanMakeCall
                     select addr.MakeCall(address, (country == null) ? 0 : country.CountryCode, param)
                     ).FirstOrDefault();
         }
@@ -1405,7 +1405,7 @@ namespace JulMar.Atapi
             int rc = NativeMethods.lineForward(Handle, 1, 0, IntPtr.Zero, 0, out hCall, IntPtr.Zero);
             if (rc < 0)
                 throw new TapiException("lineForward failed", rc);
-            
+
             // Wait for the LINE_REPLY so we don't need to deal with the value type 
             // issues of IntPtr being filled in async.
             var req = new PendingTapiRequest(rc, null, null);
@@ -1563,7 +1563,7 @@ namespace JulMar.Atapi
                 Marshal.FreeHGlobal(pVs);
             }
             while (rc == NativeMethods.LINEERR_STRUCTURETOOSMALL);
-            
+
             if (rc != 0)
                 throw new TapiException("lineGetDevConfig failed", rc);
             return rawBuffer;
@@ -1629,7 +1629,7 @@ namespace JulMar.Atapi
                 case TapiEvent.LINE_ADDRESSSTATE:
                     _addresses[dwParam1.ToInt32()].OnAddressStateChange(dwParam2.ToInt32());
                     break;
-            
+
                 case TapiEvent.LINE_LINEDEVSTATE:
                     HandleDevStateChange(dwParam1.ToInt32(), dwParam2, dwParam3);
                     break;
@@ -1675,24 +1675,20 @@ namespace JulMar.Atapi
 
         private void HandleNewCall(TapiCall call, int callPrivileges)
         {
+            f
             if (NewCall != null)
             {
                 Privilege priv = (callPrivileges == NativeMethods.LINECALLPRIVILEGE_NONE) ? Privilege.None :
                     (callPrivileges == NativeMethods.LINECALLPRIVILEGE_MONITOR) ? Privilege.Monitor : Privilege.Owner;
                 foreach (EventHandler<NewCallEventArgs> nc in NewCall.GetInvocationList())
                 {
-                    nc.BeginInvoke(this, new NewCallEventArgs(call, priv),
-                        delegate(IAsyncResult ar) 
-                        {
-                            try
-                            {
-                                var nce = (EventHandler<NewCallEventArgs>)ar.AsyncState;
-                                nce.EndInvoke(ar);
-                            }
-                            catch
-                            {
-                            }
-                        }, nc);
+                    try
+                    {
+                        await Task.Run(() => nc(this, new NewCallEventArgs(call, priv)));
+                    }
+                    catch
+                    {
+                    }
                 }
             }
         }
